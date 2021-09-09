@@ -9,7 +9,7 @@
 #include "../Gui.h"
 #include "../Main.h"
 #include "../FileHandling.h"
-#include "../Gfx.h"
+#include "../Gfx.h"				// g_flicker & g_twitch
 #include "../io.h"
 #include "../Sound.h"
 #include "AsmExtra.h"
@@ -44,8 +44,11 @@ u8 autoA = 0;			// 0=off, 1=on, 2=R
 u8 autoB = 0;
 u8 g_debugSet = 0;		// Should we output debug text?
 bool settingsChanged = false;
+bool pauseEmulation = false;
 
+int sleepTime = 60*60*5;			// 5 min
 int selected = 0;
+
 static int selectedMenu = 0;
 static int selectedMain = 0;
 static int lastMainMenu = 1;
@@ -164,7 +167,7 @@ void openMenu() {
 	powerOn(PM_BACKLIGHT_TOP);
 	powerOn(PM_BACKLIGHT_BOTTOM);
 	lcdMainOnTop();
-	if (emuSettings & AUTOPAUSE_EMULATION) {		// Should we pause when menu is open?
+	if (emuSettings & AUTOPAUSE_EMULATION) {
 		pauseEmulation = true;
 		setMuteSoundGUI();
 	}
@@ -680,14 +683,19 @@ void autoNVRAMSet() {
 	settingsChanged = true;
 }
 
+void saveNVRAMSet() {
+	emuSettings ^= AUTOSAVE_NVRAM;
+	settingsChanged = true;
+}
+
 void debugTextSet() {
 	g_debugSet ^= true;
 }
 
 void sleepSet() {
 	int i;
-	i = (emuSettings+0x10) & 0x30;
-	emuSettings = (emuSettings & ~0x30) | i;
+	i = (emuSettings+0x10) & AUTOSLEEP_MASK;
+	emuSettings = (emuSettings & ~AUTOSLEEP_MASK) | i;
 	if (i == AUTOSLEEP_5MIN) {
 		sleepTime = 60*60*5;		// 5 min
 	}
@@ -739,14 +747,14 @@ void autoBSet() {
 
 void speedSet() {
 	int i;
-	i = (emuSettings+0x40) & 0xC0;
-	emuSettings = (emuSettings & ~0xC0) | i;
+	i = (emuSettings+0x40) & EMUSPEED_MASK;
+	emuSettings = (emuSettings & ~EMUSPEED_MASK) | i;
 	setEmuSpeed(i>>6);
 }
 
 void flickSet() {
 	g_flicker++;
-	if (g_flicker > 1){
+	if (g_flicker > 1) {
 		g_flicker = 0;
 		g_twitch = 0;
 	}
