@@ -46,6 +46,7 @@ u8 g_debugSet = 0;		// Should we output debug text?
 bool settingsChanged = false;
 bool pauseEmulation = false;
 
+int emuSettings = 0;
 int sleepTime = 60*60*5;			// 5 min
 int selected = 0;
 
