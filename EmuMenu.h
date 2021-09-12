@@ -15,6 +15,7 @@ extern u8 g_debugSet;
 
 extern bool settingsChanged;
 extern bool pauseEmulation;
+extern bool enableExit;
 
 extern int emuSettings;
 extern int sleepTime;

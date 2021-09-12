@@ -8,6 +8,7 @@ extern "C" {
 #define AUTOPAUSE_EMULATION	(1<<0)
 #define POWER_SAVE_MENU		(1<<1)
 #define AUTOLOAD_STATE		(1<<2)
+#define SHOW_UI_CLOCK		(1<<3)
 #define AUTOSLEEP_5MIN		(0<<4)
 #define AUTOSLEEP_10MIN		(1<<4)
 #define AUTOSLEEP_30MIN		(2<<4)

@@ -6,13 +6,14 @@
 
 #include "EmuMenu.h"
 #include "EmuSettings.h"
-#include "../Gui.h"
+#include "FileHelper.h"
+#include "AsmExtra.h"
 #include "../Main.h"
+#include "../Gui.h"
 #include "../FileHandling.h"
 #include "../Gfx.h"				// g_flicker & g_twitch
 #include "../io.h"
 #include "../Sound.h"
-#include "AsmExtra.h"
 
 extern const fptr fnMain[];
 extern const fptr *const fnListX[];
@@ -45,6 +46,7 @@ u8 autoB = 0;
 u8 g_debugSet = 0;		// Should we output debug text?
 bool settingsChanged = false;
 bool pauseEmulation = false;
+bool enableExit = false;
 
 int emuSettings = 0;
 int sleepTime = 60*60*5;			// 5 min
@@ -641,7 +643,9 @@ char *updateTime() {
 		timeBuffer[3] = bin2BCD(timeStruct->tm_year);
 		timeBuffer[4] = bin2BCD(timeStruct->tm_mon + 1);
 		timeBuffer[5] = bin2BCD(timeStruct->tm_mday);
-		drawClock();
+		if (emuSettings & SHOW_UI_CLOCK) {
+			drawClock();
+		}
 	}
 	return timeBuffer;
 }
