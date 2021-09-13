@@ -561,8 +561,8 @@ void int2Str(int i, char *s) {
 
 	j = bin2BCD(i);
 	for (k = 28; k >= 0; k -= 4) {
-		mod = (j>>k)&15;
-		*(s++) = (mod+'0');
+		mod = (j>>k) & 15;
+		*(s++) = (mod + '0');
 	}
 	*(s++) = 0;
 }
@@ -570,15 +570,24 @@ void int2Str(int i, char *s) {
 void int2HexStr(char *dest, int val) {
 	int i;
 	for (i = 0; i < 8; i++) {
-		dest[7-i] = (val & 0xF) + ((val & 0xF) < 10) ? '0' : 'A';
+		dest[7-i] = (val & 0xF) + (((val & 0xF) < 10) ? '0' : '7');
 		val = val>>4;
 	}
 	dest[8] = 0;
 }
 
+void short2HexStr(char *dest, short val) {
+	int i;
+	for (i = 0; i < 4; i++) {
+		dest[3-i] = (val & 0xF) + (((val & 0xF) < 10) ? '0' : '7');
+		val = val>>4;
+	}
+	dest[4] = 0;
+}
+
 void char2HexStr(char *dest, char val) {
-	dest[0] = ((val>>4) & 0xF) + ((val & 0xF) < 10) ? '0' : 'A';
-	dest[1] = (val & 0xF) + ((val & 0xF) < 10) ? '0' : 'A';
+	dest[0] = ((val>>4) & 0xF) + (((val & 0xF) < 10) ? '0' : '7');
+	dest[1] = (val & 0xF) + (((val & 0xF) < 10) ? '0' : '7');
 	dest[2] = 0;
 }
 
