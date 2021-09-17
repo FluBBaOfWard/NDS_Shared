@@ -43,7 +43,8 @@ static const char tabBotAbout[] = {0x89, ' ', ' ', ' ', ' ', ' ',0x8A,0};
 
 u8 autoA = 0;			// 0=off, 1=on, 2=R
 u8 autoB = 0;
-u8 g_debugSet = 0;		// Should we output debug text?
+
+bool g_debugSet = 0;		// Should we output debug text?
 bool settingsChanged = false;
 bool pauseEmulation = false;
 bool enableExit = false;
