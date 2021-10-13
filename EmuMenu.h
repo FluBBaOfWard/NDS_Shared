@@ -59,6 +59,7 @@ void setSelectedMenu(int menuNr);
 void openMenu(void);
 void backOutOfMenu(void);
 void closeMenu(void);
+bool isMenuOpen(void);
 
 void exitEmulator(void);
 

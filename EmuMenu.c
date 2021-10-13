@@ -184,6 +184,10 @@ void closeMenu() {
 	setSelectedMenu(0);
 }
 
+bool isMenuOpen() {
+	return (selectedMenu != 0);
+}
+
 void backOutOfMenu() {
 	setSelectedMenu(menuXback[selectedMenu]);
 }
