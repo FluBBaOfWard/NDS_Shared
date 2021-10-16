@@ -9,15 +9,23 @@ extern "C" {
 
 typedef void (*fptr)(void);
 
+/// Autofire for button A
 extern u8 autoA;
+/// Autofire for button B
 extern u8 autoB;
 
-extern bool g_debugSet;
+/// Should we output debug text?
+extern bool gDebugSet;
+/// True if any settings have changed that are not saved.
 extern bool settingsChanged;
+/// True if emulation paused right now.
 extern bool pauseEmulation;
+/// True if exit menu is enabled.
 extern bool enableExit;
 
+/// Various common settings
 extern int emuSettings;
+/// Current set sleep time, default 5min.
 extern int sleepTime;
 /// This is the current row in the menu.
 extern int selected;

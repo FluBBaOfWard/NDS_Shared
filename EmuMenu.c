@@ -17,16 +17,16 @@
 
 extern const fptr fnMain[];
 extern const fptr *const fnListX[];
-extern const u8 menuXitems[];
-extern const fptr drawuiX[];
-extern const u8 menuXback[];
+extern const u8 menuXItems[];
+extern const fptr drawUIX[];
+extern const u8 menuXBack[];
 
 static void exitUI(void);
 static void drawClock(void);
 
 static const char menuTopRow[] = {   0x82,0x83, ' ',0x81,0x82,0x82,0x82,0x82,0x83, ' ',0x81,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x83, ' ',0x81,0x82,0x82,0x82,0x82,0x82,0x83,0};
 static const char menuMiddleRow[] = { 'X',0x85, ' ',0x84, 'F', 'i', 'l', 'e',0x85, ' ',0x84, 'O', 'p', 't', 'i', 'o', 'n', 's',0x85, ' ',0x84, 'A', 'b', 'o', 'u', 't',0x85,0};
-static const char menuBottomRow[] = { ' ',0x8A, ' ',0x89, ' ', ' ', ' ', ' ',0x8A, ' ',0x89, ' ', ' ', ' ', ' ', ' ', ' ', ' ',0x8A, ' ',0x89, ' ', ' ', ' ', ' ', ' ',0x8A,0};
+static const char menuBottomRow[] = { ' ',0x8A,0x82,0x89, ' ', ' ', ' ', ' ',0x8A,0x82,0x89, ' ', ' ', ' ', ' ', ' ', ' ', ' ',0x8A,0x82,0x89, ' ', ' ', ' ', ' ', ' ',0x8A,0x82,0x82,0x82,0x82,0x82,0};
 static const char menuFrontRow[] = { 0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0};
 
 static const char tabTopFile[] = {0x81,0x82,0x82,0x82,0x82,0x83,0};
@@ -41,16 +41,16 @@ static const char tabTopAbout[] = {0x81,0x82,0x82,0x82,0x82,0x82,0x83,0};
 static const char tabMidAbout[] = {0x84, 'A', 'b', 'o', 'u', 't',0x85,0};
 static const char tabBotAbout[] = {0x89, ' ', ' ', ' ', ' ', ' ',0x8A,0};
 
-u8 autoA = 0;			// 0=off, 1=on, 2=R
+u8 autoA = 0;				// 0=off, 1=on, 2=R
 u8 autoB = 0;
 
-bool g_debugSet = 0;		// Should we output debug text?
+bool gDebugSet = 0;
 bool settingsChanged = false;
 bool pauseEmulation = false;
 bool enableExit = false;
 
 int emuSettings = 0;
-int sleepTime = 60*60*5;			// 5 min
+int sleepTime = 60*60*5;		// 5min
 int selected = 0;
 
 static int selectedMenu = 0;
@@ -59,6 +59,7 @@ static int lastMainMenu = 1;
 static int mainUIPosition = 0;
 static int menuItemRow = 0;
 static int lineRepeat = 0;
+static int menuYOffset = 0;
 
 static int logBufPtr = 0;
 static int logBufPtrOld = 0;
@@ -189,7 +190,7 @@ bool isMenuOpen() {
 }
 
 void backOutOfMenu() {
-	setSelectedMenu(menuXback[selectedMenu]);
+	setSelectedMenu(menuXBack[selectedMenu]);
 }
 
 void exitUI() {
@@ -227,7 +228,7 @@ void nullUI() {
 		return;
 	}
 
-	if (g_debugSet) {
+	if (gDebugSet) {
 		drawItem(fpsText, 0, 0, 0);
 		nullUIDebug(key);
 	}
@@ -239,7 +240,7 @@ void nullUI() {
 
 /// This is during menu.
 void subUI() {
-	const int key = getMenuInput(menuXitems[selectedMenu]);
+	const int key = getMenuInput(menuXItems[selectedMenu]);
 
 	if (key & KEY_A) {
 		fnListX[selectedMenu][selected]();
@@ -342,7 +343,18 @@ int getMenuTouch(int *keyHit, int sel, int itemCount) {
 }
 
 void redrawUI() {
-	drawuiX[selectedMenu]();
+	// Fix up vertical position of items
+	int itemCount = menuXItems[selectedMenu];
+	if (itemCount > 9 && selected > 4) {
+		menuYOffset = (selected - 4);
+		if (menuYOffset > (itemCount - 9)) {
+			menuYOffset = (itemCount - 9);
+		}
+	}
+	else {
+		menuYOffset = 0;
+	}
+	drawUIX[selectedMenu]();
 	outputLogToScreen();
 }
 
@@ -478,23 +490,29 @@ void strlMerge(char *dst, const char *src1, const char *src2, int dstSize) {
 }
 
 void drawMenuItem(const char *str) {
-	if (selected == menuItemRow) {
-		drawItemBackground(str, menuItemRow*2+5, 0);
+	int drawRow = (menuItemRow-menuYOffset)*2+5;
+	if (drawRow > 4) {
+		if (selected == menuItemRow) {
+			drawItemBackground(str, drawRow, 0);
+		}
+		drawSubText(str, drawRow, (selected == menuItemRow));
 	}
-	drawSubText(str, menuItemRow*2+5, (selected == menuItemRow));
 	menuItemRow++;
 }
 
 void drawSubItem(const char *str1, const char *str2) {
 	char str[48];
-	if (selected == menuItemRow) {
-		drawItemBackground(str1, menuItemRow*2+5, 1);
+	int drawRow = (menuItemRow-menuYOffset)*2+5;
+	if (drawRow > 4) {
+		if (selected == menuItemRow) {
+			drawItemBackground(str1, drawRow, 1);
+		}
+		strlMerge(str, "  ", str1, sizeof(str));
+		if (str2) {
+			strlMerge(str, str, str2, sizeof(str));
+		}
+		drawText(str, drawRow, selected==menuItemRow);
 	}
-	strlMerge(str, "  ", str1, sizeof(str));
-	if (str2) {
-		strlMerge(str, str, str2, sizeof(str));
-	}
-	drawText(str, menuItemRow*2+5, selected==menuItemRow);
 	menuItemRow++;
 }
 
@@ -634,7 +652,7 @@ void infoOutput(const char *str) {
 }
 
 void debugOutput(const char *str) {
-	if (g_debugSet) {
+	if (gDebugSet) {
 		infoOutput(str);
 	}
 	debugOutputToEmulator(str);
@@ -708,7 +726,7 @@ void saveNVRAMSet() {
 }
 
 void debugTextSet() {
-	g_debugSet ^= true;
+	gDebugSet ^= true;
 }
 
 void sleepSet() {

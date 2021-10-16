@@ -268,7 +268,7 @@ r0Continue:
 debugOutput_asm:			;@ Input = r1. ptr to str.
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{r0-r3,lr}
-	ldr r0,=g_debugSet
+	ldr r0,=gDebugSet
 	ldrb r0,[r0]
 	cmp r0,#0
 	ldmfdeq sp!,{r0-r3,pc}
