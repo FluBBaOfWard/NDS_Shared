@@ -609,7 +609,7 @@ void short2HexStr(char *dest, short val) {
 }
 
 void char2HexStr(char *dest, char val) {
-	dest[0] = ((val>>4) & 0xF) + (((val & 0xF) < 10) ? '0' : '7');
+	dest[0] = ((val>>4) & 0xF) + ((((val>>4) & 0xF) < 10) ? '0' : '7');
 	dest[1] = (val & 0xF) + (((val & 0xF) < 10) ? '0' : '7');
 	dest[2] = 0;
 }

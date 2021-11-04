@@ -180,21 +180,20 @@
 #define	REG_BG2VOFS			0x1A
 #define	REG_BG3HOFS			0x1C
 #define	REG_BG3VOFS			0x1E
+
 #define	REG_BG2PA			0x20
 #define	REG_BG2PB			0x22
 #define	REG_BG2PC			0x24
 #define	REG_BG2PD			0x26
-
 #define	REG_BG2X			0x28
 #define	REG_BG2Y			0x2C
+
 #define	REG_BG3PA			0x30
 #define	REG_BG3PB			0x32
 #define	REG_BG3PC			0x34
 #define	REG_BG3PD			0x36
-
 #define	REG_BG3X			0x38
 #define	REG_BG3Y			0x3C
-
 
 #define	REG_WIN0H			0x40
 #define	REG_WIN1H			0x42

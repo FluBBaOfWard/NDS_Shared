@@ -245,6 +245,10 @@ debugLoop:
 	cmp r1,#0
 	subsne r12,r12,#1
 	bne debugLoop
+	mov r1,#0xA					;@ New line
+	strb r1,[r2,#-1]
+	mov r1,#0					;@ END
+	strb r1,[r2]
 dStringEnd:
 	mov r12,r12
 	b debugContinue
