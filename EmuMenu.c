@@ -11,7 +11,7 @@
 #include "../Main.h"
 #include "../Gui.h"
 #include "../FileHandling.h"
-#include "../Gfx.h"				// g_flicker & g_twitch
+#include "../Gfx.h"				// gFlicker & gTwitch
 #include "../io.h"
 #include "../Sound.h"
 
@@ -790,9 +790,9 @@ void speedSet() {
 }
 
 void flickSet() {
-	g_flicker++;
-	if (g_flicker > 1) {
-		g_flicker = 0;
-		g_twitch = 0;
+	gFlicker++;
+	if (gFlicker > 1) {
+		gFlicker = 0;
+		gTwitch = 0;
 	}
 }
