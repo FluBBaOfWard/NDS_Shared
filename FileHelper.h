@@ -43,6 +43,14 @@ int findFolder(const char *folderName);
 void getFileExtension(char *dest, const char *fileName);
 
 /**
+ * Sets or replaces the filename extension.
+ * @param  *fileName: The file name to handle.
+ * @param  *newExt: File extension to set.
+ * @param  dstSize: Total size of filename buffer.
+ */
+void setFileExtension(char *fileName, const char *newExt, int dstSize);
+
+/**
  * A file browser that shows files according to the file types specified.
  * @param  *fileTypes: All file types that are valid (".txt.bin.rom.zip", etc).
  * @return The selected files name, or NULL if none selected.

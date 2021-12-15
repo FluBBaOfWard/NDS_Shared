@@ -127,6 +127,15 @@ void getFileExtension(char *dest, const char *fileName) {
 	}
 }
 
+void setFileExtension(char *fileName, const char *newExt, int dstSize) {
+	char *strExt;
+
+	if ( (strExt = strrchr(fileName, '.')) != NULL) {
+		strExt[0] = 0;
+	}
+	strlcat(fileName, newExt, dstSize);
+}
+
 //---------------------------------------------------------------------------------
 const char *browseForFileType(const char *fileTypes) {
 	static int pos = 0;
