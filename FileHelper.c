@@ -7,7 +7,7 @@
 
 #include "FileHelper.h"
 #include "EmuMenu.h"
-#include "unzip/unzipnds.h"
+#include "Unzip/unzipnds.h"
 #include "crc32.h"
 #include "../Main.h"
 #include "../Filehandling.h"
