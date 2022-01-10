@@ -10,7 +10,7 @@
 #include "Unzip/unzipnds.h"
 #include "crc32.h"
 #include "../Main.h"
-#include "../Filehandling.h"
+#include "../FileHandling.h"
 
 static const int directoryCacheSize = 0x8000;
 static const int directoryMaxEntries = 768;
