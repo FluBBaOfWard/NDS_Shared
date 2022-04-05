@@ -115,7 +115,7 @@ void getFileExtension(char *dest, const char *fileName) {
 	const char *strExt;
 
 	dest[0] = 0;
-	if ( (strExt = strrchr(fileName, '.')) == 0) {
+	if ( (strExt = strrchr(fileName, '.')) == NULL) {
 		return;
 	}
 	strlcpy(dest, strExt, 8);
