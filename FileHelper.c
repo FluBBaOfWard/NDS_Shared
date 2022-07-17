@@ -76,7 +76,7 @@ int loadROM(void *dest, const char *fileName, const int maxSize) {
 		fseek(file, 0, SEEK_END);
 		size = ftell(file);
 		if ( size > maxSize ) {
-			infoOutput("File to large!");
+			infoOutput("File too large!");
 			size = 0;
 		} else {
 			fseek(file, 0, SEEK_SET);
