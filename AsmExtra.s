@@ -7,6 +7,7 @@
 	.global getRandomNumber
 	.global setupSpriteScaling
 	.global calculateFPS
+	.global setLCDFPS
 	.global fpsValue
 	.global fpsText
 	.global fpsNominal
@@ -189,8 +190,19 @@ calculateFPS:					;@ fps output, r0-r3=used.
 
 	bx lr
 ;@----------------------------------------------------------------------------
+setLCDFPS:					;@ Write LCD FPS, r0=in fps, r0-r1=used.
+	.type   setLCDFPS STT_FUNC
+;@----------------------------------------------------------------------------
+	mov r1,#10
+	swi 0x090000				;@ Division r0/r1, r0=result, r1=remainder.
+	add r0,r0,#0x30
+	strb r0,fpsText+8
+	add r1,r1,#0x30
+	strb r1,fpsText+9
+	bx lr
+;@----------------------------------------------------------------------------
 fpsValue:	.long 0
-fpsText:	.string "FPS:   "
+fpsText:	.string "FPS:   /60"
 fpsCheck:	.byte 0
 fpsNominal:	.byte 59
 	.align 2
