@@ -144,6 +144,12 @@ void ui7() {
 void ui8() {
 	setSelectedMenu(8);
 }
+void ui9() {
+	setSelectedMenu(9);
+}
+void ui10() {
+	setSelectedMenu(10);
+}
 
 void setSelectedMenu(int menuNr) {
 	if (selectedMain == selectedMenu) {		// Are we going from a mainMenu to a subMenu?
