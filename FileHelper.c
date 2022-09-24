@@ -36,7 +36,7 @@ int fatAvailable = 0;
 static char *dTable = 0;
 static char **entriesTable = 0;
 /** Current number of entries in the directory table */
-static int dItems = 0;
+static int dItemCount = 0;
 static int dCacheLeft = 0;
 static unsigned int dirCRC32 = 0;
 static char spinnerCount = 0;
@@ -217,18 +217,18 @@ const char *browseForFileType(const char *fileTypes) {
 		if (dTable == 0) {
 			dTable = malloc(directoryCacheSize);
 		}
-		dItems = getDirectory(dTable, currentDir, fileTypes);
-		if (dItems == -1) {
+		dItemCount = getDirectory(dTable, currentDir, fileTypes);
+		if (dItemCount == -1) {
 			directoryBack(currentDir);
 		}
-		if (dItems > 0) {
-			if (pos >= dItems) {
-				pos = dItems-1;
+		if (dItemCount > 0) {
+			if (pos >= dItemCount) {
+				pos = dItemCount-1;
 			}
 			while (1) {
 				waitVBlank();
 				pressed = getInput();
-				pos = getMenuPos(pressed, pos, dItems);
+				pos = getMenuPos(pressed, pos, dItemCount);
 				if (pressed & (KEY_A)) {
 					strP = directoryStringFromPos(entriesTable, pos);
 					if ( !(strstr(strP, "~")) ) {
@@ -240,10 +240,10 @@ const char *browseForFileType(const char *fileTypes) {
 							}
 							strlcat(currentDir, strP, sizeof(currentDir));
 						}
-						dItems = getDirectory(dTable, currentDir, fileTypes);
-						if (dItems == -1) {
+						dItemCount = getDirectory(dTable, currentDir, fileTypes);
+						if (dItemCount == -1) {
 							directoryBack(currentDir);
-							dItems = 0;
+							dItemCount = 0;
 						}
 						pos = 0;
 						oldPos = -1;
@@ -253,7 +253,7 @@ const char *browseForFileType(const char *fileTypes) {
 				}
 				if (oldPos != pos) {
 					oldPos = pos;
-					row = drawFileList(entriesTable, pos, dItems);
+					row = drawFileList(entriesTable, pos, dItemCount);
 					outputLogToScreen();
 				} else {
 					drawLongFilename(entriesTable, pos, row);
@@ -276,49 +276,49 @@ static void directoryBack(char *path) {
 }
 
 static void directoryInit(char *dirTable) {
-	dItems = 0;
+	dItemCount = 0;
 	memset(dirTable, 0, directoryCacheSize);
 	dCacheLeft = directoryCacheSize - (directoryMaxEntries * 4);
 	entriesTable = (char **)(dirTable + dCacheLeft);
-	entriesTable[dItems] = dirTable;
+	entriesTable[dItemCount] = dirTable;
 }
 /*
 static void directoryFlushCache() {
 	free(dTable);
 	dTable = 0;
-	dItems = 0;
+	dItemCount = 0;
 	dirCRC32 = 0;
 }
 */
 const char *directoryStringFromPos(char **dirEntries, int pos) {
-	if (pos < dItems) {
+	if (pos < dItemCount) {
 		return dirEntries[pos];
 	}
 	return NULL;
 }
 
 static const char *directoryAddDirname(char **dirEntries, const char *dirName) {
-	char *dest = dirEntries[dItems];
+	char *dest = dirEntries[dItemCount];
 	int nameLen = strlen(dirName) + 1;
-	if (dItems < directoryMaxEntries) {
+	if (dItemCount < directoryMaxEntries) {
 		if ((dCacheLeft -= (nameLen)) > 0) {
 			memcpy(dest, dirName, nameLen);
-			dItems++;
-			dirEntries[dItems] = dest + nameLen;
+			dItemCount++;
+			dirEntries[dItemCount] = dest + nameLen;
 		}
 	}
 	return dest;
 }
 
 static const char *directoryAddFilename(char **dirEntries, const char *fileName) {
-	char *dest = dirEntries[dItems];
+	char *dest = dirEntries[dItemCount];
 	int nameLen = strlen(fileName) + 2;
-	if (dItems < directoryMaxEntries) {
+	if (dItemCount < directoryMaxEntries) {
 		if ((dCacheLeft -= (nameLen)) > 0) {
 			*dest = '~';
 			memcpy(dest+1, fileName, nameLen - 1);
-			dItems++;
-			dirEntries[dItems] = dest + nameLen;
+			dItemCount++;
+			dirEntries[dItemCount] = dest + nameLen;
 		}
 	}
 	return dest;
@@ -361,7 +361,7 @@ static int getDirectory(char *dirTable, const char *dirName, const char *fileTyp
 	i = crc32(0, (const unsigned char *)dirName, strlen(dirName));
 	i = crc32(i, (const unsigned char *)fileTypes, strlen(fileTypes));
 	if (i == dirCRC32) {
-		return dItems;
+		return dItemCount;
 	}
 	dirCRC32 = i;
 	i = 0;
@@ -395,7 +395,7 @@ static int getDirectory(char *dirTable, const char *dirName, const char *fileTyp
 			drawSpinner();
 		}
 		closedir(pDir);
-		directorySort(entriesTable, dItems-1);
+		directorySort(entriesTable, dItemCount-1);
 	}
-	return dItems;
+	return dItemCount;
 }
