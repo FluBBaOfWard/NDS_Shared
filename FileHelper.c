@@ -91,6 +91,72 @@ int loadROM(void *dest, const char *fileName, const int maxSize) {
 	return size;
 }
 
+bool loadDeviceState(const char *folderName) {
+	bool err = true;
+	FILE *file;
+	u32 *statePtr;
+	char stateName[FILENAMEMAXLENGTH];
+
+	if (findFolder(folderName)) {
+		return err;
+	}
+	setFileExtension(stateName, currentFilename, ".sta", sizeof(stateName));
+	if ( (file = fopen(stateName, "r")) ) {
+		int stateSize = getStateSize();
+		if ( (statePtr = malloc(stateSize)) ) {
+			cls(0);
+			drawText("        Loading state...", 11, 0);
+			fread(statePtr, 1, stateSize, file);
+			unpackState(statePtr);
+			free(statePtr);
+			err = false;
+			infoOutput("Loaded state.");
+		}
+		else {
+			infoOutput("Couldn't alloc mem for state.");
+		}
+		fclose(file);
+	}
+	else {
+		infoOutput("Couldn't open state file:");
+		infoOutput(stateName);
+	}
+	return err;
+}
+
+bool saveDeviceState(const char *folderName) {
+	bool err = true;
+	FILE *file;
+	u32 *statePtr;
+	char stateName[FILENAMEMAXLENGTH];
+
+	if ( findFolder(folderName) ) {
+		return err;
+	}
+	setFileExtension(stateName, currentFilename, ".sta", sizeof(stateName));
+	if ( (file = fopen(stateName, "w")) ) {
+		int stateSize = getStateSize();
+		if ( (statePtr = malloc(stateSize)) ) {
+			cls(0);
+			drawText("        Saving state...", 11, 0);
+			packState(statePtr);
+			fwrite(statePtr, 1, stateSize, file);
+			free(statePtr);
+			err = false;
+			infoOutput("Saved state.");
+		}
+		else {
+			infoOutput("Couldn't alloc mem for state.");
+		}
+		fclose(file);
+	}
+	else {
+		infoOutput("Couldn't open state file:");
+		infoOutput(stateName);
+	}
+	return err;
+}
+
 int findFolder(const char *folderName) {
 	char tempString[FILEPATHMAXLENGTH];
 	int retValue = 0;
@@ -127,13 +193,16 @@ void getFileExtension(char *dest, const char *fileName) {
 	}
 }
 
-void setFileExtension(char *fileName, const char *newExt, int dstSize) {
+void setFileExtension(char *dest, const char *fileName, const char *newExt, int dstSize) {
 	char *strExt;
 
-	if ( (strExt = strrchr(fileName, '.')) != NULL) {
+	if (dest != fileName) {
+		strlcpy(dest, fileName, dstSize);
+	}
+	if ( (strExt = strrchr(dest, '.')) != NULL) {
 		strExt[0] = 0;
 	}
-	strlcat(fileName, newExt, dstSize);
+	strlcat(dest, newExt, dstSize);
 }
 
 //---------------------------------------------------------------------------------
