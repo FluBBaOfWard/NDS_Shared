@@ -9,17 +9,19 @@ extern "C" {
 #define FILL0XFF "FILL0XFF"
 
 typedef struct {				// (ArcadeRom)
-	const char *romName;		// Rom name.
+	const char *const romName;	// Rom name.
 	const int romSize;			// Rom size in bytes
 	const int romCRC;			// Rom CRC32
 } ArcadeRom;
 
 typedef struct {				// (ArcadeGame)
-	const char *gameName;		// short name (archive name)
-	const char *fullName;		// Full name
+	const char *const gameName;	// Short name (archive name)
+	const char *const fullName;	// Full name
 	const int romCount;
-	const ArcadeRom *roms;		// Pointer to array of ArcadeRoms
+	const ArcadeRom *const roms;	// Pointer to array of ArcadeRoms
 } ArcadeGame;
+
+bool loadACRoms(u8 *dest, const ArcadeGame *gameList, int gameNr, int gameCount, bool doLoad);
 
 #ifdef __cplusplus
 } // extern "C"
