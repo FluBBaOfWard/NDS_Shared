@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#define AC_GAME(shortName,gameName,gameRoms)  {(shortName),(gameName),(sizeof((gameRoms))/sizeof((gameRoms)[0])),gameRoms},
+
 #define FILL0X00 "FILL0X00"
 #define FILL0XFF "FILL0XFF"
 

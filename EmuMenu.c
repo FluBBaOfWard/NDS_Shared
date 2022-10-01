@@ -86,7 +86,7 @@ void setupMenu() {
 }
 void setupSubMenu(const char *menuString) {
 	setupMenu();
-	drawSubText(menuString, 3, 0);
+	drawMenuText(menuString, 3, 0);
 }
 
 void uiYesNo() {
@@ -429,29 +429,40 @@ void cls(int chrMap) {
 	}
 }
 
-void drawSubText(const char *str1, int row, int hiLite) {
-	char str[32];
-	strlMerge(str, " ", str1, sizeof(str));
-	drawText(str, row, hiLite);
-}
-
-void drawText(const char *str, int row, int hiLite) {
-	u16 *here = map0sub+row*32;
+int drawItem(const char *str, int col, int row, int pal) {
+	u16 *here = map0sub+col+row*32;
 	int i = 0;
 
-//	*here = hiLite?0x012a:0x0120;
-//	here++;
-	hiLite = (hiLite<<12)+0x0100;
+	int attrib = (pal<<12)|0x100;
 	while (str[i] >= ' ') {
-		here[i] = str[i]|hiLite;
+		here[i] = str[i]|attrib;
 		i++;
-		if (i > 31) {
+		if ((i + col) > 31) {
 			break;
 		}
 	}
+	return i+col;
+}
+
+void drawTextLine(const char *str, int col, int row, int hiLite) {
+	u16 *here = map0sub+row*32;
+	int i = drawItem(str, col, row, hiLite);
+
 	for (; i < 32; i++) {
 		here[i] = 0x0120;
 	}
+}
+
+void drawText(const char *str, int row, int hiLite) {
+	drawTextLine(str, 0, row, hiLite);
+}
+
+void drawMenuText(const char *str, int row, int hiLite) {
+	drawTextLine(str, 1, row, hiLite);
+}
+
+void drawSubText(const char *str, int row, int hiLite) {
+	drawTextLine(str, 2, row, hiLite);
 }
 
 void drawBText(const char *str, int row, int shadow) {
@@ -501,7 +512,7 @@ void drawMenuItem(const char *str) {
 		if (selected == menuItemRow) {
 			drawItemBackground(str, drawRow, 0);
 		}
-		drawSubText(str, drawRow, (selected == menuItemRow));
+		drawMenuText(str, drawRow, (selected == menuItemRow));
 	}
 	menuItemRow++;
 }
@@ -513,27 +524,16 @@ void drawSubItem(const char *str1, const char *str2) {
 		if (selected == menuItemRow) {
 			drawItemBackground(str1, drawRow, 1);
 		}
-		strlMerge(str, "  ", str1, sizeof(str));
 		if (str2) {
+			strlMerge(str, str1, " ", sizeof(str));
 			strlMerge(str, str, str2, sizeof(str));
 		}
-		drawText(str, drawRow, selected==menuItemRow);
+		else {
+			strlcpy(str, str1, sizeof(str));
+		}
+		drawSubText(str, drawRow, (selected == menuItemRow));
 	}
 	menuItemRow++;
-}
-
-void drawItem(const char *str, int col, int row, int pal) {
-	u16 *here = map0sub+col+row*32;
-	int attrib = (pal<<12)|0x100;
-	int i = 0;
-
-	while (str[i] >= ' ') {
-		here[i] = str[i]|attrib;
-		i++;
-		if ((i + col) > 31) {
-			break;
-		}
-	}
 }
 
 void setMenuItemRow(int row) {
@@ -556,7 +556,7 @@ void drawItemBackground(const char *str, int row, int sub) {
 	here[i+32] = 0x84|0x2100;
 	here[i+64] = 0x86|0x2100;
 	here[i++]  = 0x81|0x2100;
-	while (str[i] >= ' ') {
+	while (str[i-sub] >= ' ') {
 		here[i+32] = 0x80|0x2100;
 		here[i+64] = 0x87|0x2100;
 		here[i++]  = 0x82|0x2100;
