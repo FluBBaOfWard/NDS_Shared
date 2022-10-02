@@ -59,13 +59,13 @@ int selected = 0;
 static int selectedMenu = 0;
 static int selectedMain = 0;
 static int lastMainMenu = 1;
-static int mainUIPosition = 0;
 static int menuItemRow = 0;
 static int lineRepeat = 0;
 static int menuYOffset = 0;
 // How deep we are in the menu tree
 static int menuLevel = 0;
 static char menuPath[MENU_MAX_DEPTH];
+static char menuPositions[MENU_MAX_DEPTH];
 
 static int logBufPtr = 0;
 static int logBufPtrOld = 0;
@@ -158,15 +158,7 @@ void ui10() {
 }
 
 void setSelectedMenu(int menuNr) {
-	if (selectedMain == selectedMenu) {		// Are we going from a mainMenu to a subMenu?
-		mainUIPosition = selected;
-	}
 	selectedMenu = menuNr;
-	selected = 0;
-
-	if (selectedMain == selectedMenu) {		// Are we going back to a mainMenu?
-		selected = mainUIPosition;
-	}
 	if (selectedMenu == 0) {
 		exitUI();
 	}
@@ -179,15 +171,18 @@ void setSelectedMenu(int menuNr) {
 
 void setSelectedMain(int menuNr) {
 	menuLevel = 1;
+	selected = 0;
 	setSelectedMenu(menuNr);
 }
 
 void enterMenu(int menuNr) {
 	menuPath[menuLevel] = selectedMenu;
+	menuPositions[menuLevel] = selected;
 	menuLevel++;
 	if ( menuLevel >= MENU_MAX_DEPTH) {
 		menuLevel = MENU_MAX_DEPTH - 1;
 	}
+	selected = 0;
 	setSelectedMenu(menuNr);
 }
 
@@ -196,12 +191,13 @@ void backOutOfMenu() {
 	if ( menuLevel < 0) {
 		menuLevel = 0;
 	}
+	selected = menuPositions[menuLevel];
 	setSelectedMenu(menuPath[menuLevel]);
 }
 
 void openMenu() {
 	enterGUI();
-	enterMenu(lastMainMenu);
+	setSelectedMain(lastMainMenu);
 	powerOn(POWER_2D_B);
 	powerOn(PM_BACKLIGHT_TOP);
 	powerOn(PM_BACKLIGHT_BOTTOM);
