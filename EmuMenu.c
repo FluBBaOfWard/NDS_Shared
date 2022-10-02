@@ -15,14 +15,17 @@
 #include "../io.h"
 #include "../Sound.h"
 
+#define MENU_MAX_DEPTH (8)
+
 extern const fptr fnMain[];
 extern const fptr *const fnListX[];
 extern const u8 menuXItems[];
 extern const fptr drawUIX[];
-extern const u8 menuXBack[];
 
 static void exitUI(void);
 static void drawClock(void);
+static void setSelectedMenu(int menuNr);
+static void setSelectedMain(int menuNr);
 
 static const char menuTopRow[] = {   0x82,0x83, ' ',0x81,0x82,0x82,0x82,0x82,0x83, ' ',0x81,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x83, ' ',0x81,0x82,0x82,0x82,0x82,0x82,0x83,0};
 static const char menuMiddleRow[] = { 'X',0x85, ' ',0x84, 'F', 'i', 'l', 'e',0x85, ' ',0x84, 'O', 'p', 't', 'i', 'o', 'n', 's',0x85, ' ',0x84, 'A', 'b', 'o', 'u', 't',0x85,0};
@@ -60,6 +63,9 @@ static int mainUIPosition = 0;
 static int menuItemRow = 0;
 static int lineRepeat = 0;
 static int menuYOffset = 0;
+// How deep we are in the menu tree
+static int menuLevel = 0;
+static char menuPath[MENU_MAX_DEPTH];
 
 static int logBufPtr = 0;
 static int logBufPtrOld = 0;
@@ -121,34 +127,34 @@ void uiDummy() {
 }
 
 void ui1() {
-	setSelectedMenu(1);
+	setSelectedMain(1);
 }
 void ui2() {
-	setSelectedMenu(2);
+	setSelectedMain(2);
 }
 void ui3() {
-	setSelectedMenu(3);
+	setSelectedMain(3);
 }
 void ui4() {
-	setSelectedMenu(4);
+	enterMenu(4);
 }
 void ui5() {
-	setSelectedMenu(5);
+	enterMenu(5);
 }
 void ui6() {
-	setSelectedMenu(6);
+	enterMenu(6);
 }
 void ui7() {
-	setSelectedMenu(7);
+	enterMenu(7);
 }
 void ui8() {
-	setSelectedMenu(8);
+	enterMenu(8);
 }
 void ui9() {
-	setSelectedMenu(9);
+	enterMenu(9);
 }
 void ui10() {
-	setSelectedMenu(10);
+	enterMenu(10);
 }
 
 void setSelectedMenu(int menuNr) {
@@ -171,9 +177,31 @@ void setSelectedMenu(int menuNr) {
 	redrawUI();
 }
 
+void setSelectedMain(int menuNr) {
+	menuLevel = 1;
+	setSelectedMenu(menuNr);
+}
+
+void enterMenu(int menuNr) {
+	menuPath[menuLevel] = selectedMenu;
+	menuLevel++;
+	if ( menuLevel >= MENU_MAX_DEPTH) {
+		menuLevel = MENU_MAX_DEPTH - 1;
+	}
+	setSelectedMenu(menuNr);
+}
+
+void backOutOfMenu() {
+	menuLevel--;
+	if ( menuLevel < 0) {
+		menuLevel = 0;
+	}
+	setSelectedMenu(menuPath[menuLevel]);
+}
+
 void openMenu() {
 	enterGUI();
-	setSelectedMenu(lastMainMenu);
+	enterMenu(lastMainMenu);
 	powerOn(POWER_2D_B);
 	powerOn(PM_BACKLIGHT_TOP);
 	powerOn(PM_BACKLIGHT_BOTTOM);
@@ -188,15 +216,12 @@ void openMenu() {
 }
 
 void closeMenu() {
-	setSelectedMenu(0);
+	menuLevel = 0;
+	backOutOfMenu();
 }
 
 bool isMenuOpen() {
 	return (selectedMenu != 0);
-}
-
-void backOutOfMenu() {
-	setSelectedMenu(menuXBack[selectedMenu]);
 }
 
 void exitUI() {
@@ -256,12 +281,12 @@ void subUI() {
 	}
 	if (key & KEY_L) {
 		if (selectedMain > 0) {
-			setSelectedMenu(selectedMain-1);
+			setSelectedMain(selectedMain-1);
 		}
 	}
 	if (key & KEY_R) {
 		if (selectedMain < 3) {
-			setSelectedMenu(selectedMain+1);
+			setSelectedMain(selectedMain+1);
 		}
 	}
 	if (key & (KEY_A+KEY_UP+KEY_DOWN+KEY_LEFT+KEY_RIGHT+KEY_TOUCH)) {
@@ -329,15 +354,15 @@ int getMenuTouch(int *keyHit, int sel, int itemCount) {
 		} else if (myTouch.py < 24) {
 			xPos = myTouch.px>>3;
 			if ( (xPos > 3) && (xPos < 8)) {
-				setSelectedMenu(1);
+				setSelectedMain(1);
 				sel = 0;
 			}
 			else if ( (xPos > 10) && (xPos < 18)) {
-				setSelectedMenu(2);
+				setSelectedMain(2);
 				sel = 0;
 			}
 			else if ( (xPos > 20) && (xPos < 26)) {
-				setSelectedMenu(3);
+				setSelectedMain(3);
 				sel = 0;
 			}
 			else if ( xPos < 2) {

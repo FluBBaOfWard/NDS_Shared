@@ -64,7 +64,7 @@ void debugOutput(const char *str);
 void nullUI(void);
 void subUI(void);
 void uiDummy(void);
-void setSelectedMenu(int menuNr);
+void enterMenu(int menuNr);
 void openMenu(void);
 void backOutOfMenu(void);
 void closeMenu(void);
