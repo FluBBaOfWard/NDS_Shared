@@ -170,23 +170,28 @@ void setSelectedMenu(int menuNr) {
 }
 
 void setSelectedMain(int menuNr) {
-	menuLevel = 1;
-	selected = 0;
-	setSelectedMenu(menuNr);
+	menuLevel = 0;
+	enterMenu(menuNr);
 }
 
 void enterMenu(int menuNr) {
-	menuPath[menuLevel] = selectedMenu;
 	menuPositions[menuLevel] = selected;
 	menuLevel++;
-	if ( menuLevel >= MENU_MAX_DEPTH) {
+	if (menuLevel >= MENU_MAX_DEPTH) {
 		menuLevel = MENU_MAX_DEPTH - 1;
 	}
-	selected = 0;
+	if (menuPath[menuLevel] == menuNr) {
+		selected = menuPositions[menuLevel];
+	}
+	else {
+		menuPath[menuLevel] = menuNr;
+		selected = 0;
+	}
 	setSelectedMenu(menuNr);
 }
 
 void backOutOfMenu() {
+	menuPositions[menuLevel] = selected;
 	menuLevel--;
 	if ( menuLevel < 0) {
 		menuLevel = 0;
