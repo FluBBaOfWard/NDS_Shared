@@ -48,7 +48,7 @@ const char *const spinner[4]={"\\","|","/","-"};
 //---------------------------------------------------------------------------------
 
 int initFileHelper() {
-	if ( (fatAvailable = fatInitDefault()) ) {
+	if ((fatAvailable = fatInitDefault())) {
 		strcpy(currentDir, "/");
 	}
 	return fatAvailable;
@@ -66,25 +66,29 @@ int loadROM(void *dest, const char *fileName, const int maxSize) {
 
 	getFileExtension(fileExt, fileName);
 	if (strstr(fileExt, ".zip")) {
-		if ( (loadFileTypeInZip(dest, fileName, FILEEXTENSIONS, maxSize)) == 0) {
+		if ((loadFileTypeInZip(dest, fileName, FILEEXTENSIONS, maxSize)) == 0) {
 			size = cenHead.ucSize;
 			strlcpy(currentFilename, zipFilename, sizeof(currentFilename));
-		} else {
+		}
+		else {
 			infoOutput(zipError);
 		}
-	} else if ( (file = fopen(fileName, "r")) ) {
+	}
+	else if ((file = fopen(fileName, "r"))) {
 		fseek(file, 0, SEEK_END);
 		size = ftell(file);
-		if ( size > maxSize ) {
+		if (size > maxSize) {
 			infoOutput("File too large!");
 			size = 0;
-		} else {
+		}
+		else {
 			fseek(file, 0, SEEK_SET);
 			fread(dest, 1, size, file);
 			strlcpy(currentFilename, fileName, sizeof(currentFilename));
 		}
 		fclose(file);
-	} else {
+	}
+	else {
 		infoOutput("Couldn't open file:");
 		infoOutput(fileName);
 	}
@@ -101,9 +105,9 @@ bool loadDeviceState(const char *folderName) {
 		return err;
 	}
 	setFileExtension(stateName, currentFilename, ".sta", sizeof(stateName));
-	if ( (file = fopen(stateName, "r")) ) {
+	if ((file = fopen(stateName, "r"))) {
 		int stateSize = getStateSize();
-		if ( (statePtr = malloc(stateSize)) ) {
+		if ((statePtr = malloc(stateSize))) {
 			cls(0);
 			drawText("        Loading state...", 11, 0);
 			fread(statePtr, 1, stateSize, file);
@@ -130,13 +134,13 @@ bool saveDeviceState(const char *folderName) {
 	u32 *statePtr;
 	char stateName[FILENAMEMAXLENGTH];
 
-	if ( findFolder(folderName) ) {
+	if (findFolder(folderName)) {
 		return err;
 	}
 	setFileExtension(stateName, currentFilename, ".sta", sizeof(stateName));
-	if ( (file = fopen(stateName, "w")) ) {
+	if ((file = fopen(stateName, "w"))) {
 		int stateSize = getStateSize();
-		if ( (statePtr = malloc(stateSize)) ) {
+		if ((statePtr = malloc(stateSize))) {
 			cls(0);
 			drawText("        Saving state...", 11, 0);
 			packState(statePtr);
@@ -181,7 +185,7 @@ void getFileExtension(char *dest, const char *fileName) {
 	const char *strExt;
 
 	dest[0] = 0;
-	if ( (strExt = strrchr(fileName, '.')) == NULL) {
+	if ((strExt = strrchr(fileName, '.')) == NULL) {
 		return;
 	}
 	strlcpy(dest, strExt, 8);
@@ -199,7 +203,7 @@ void setFileExtension(char *dest, const char *fileName, const char *newExt, int 
 	if (dest != fileName) {
 		strlcpy(dest, fileName, dstSize);
 	}
-	if ( (strExt = strrchr(dest, '.')) != NULL) {
+	if ((strExt = strrchr(dest, '.')) != NULL) {
 		strExt[0] = 0;
 	}
 	strlcat(dest, newExt, dstSize);
@@ -231,10 +235,11 @@ const char *browseForFileType(const char *fileTypes) {
 				pos = getMenuPos(pressed, pos, dItemCount);
 				if (pressed & (KEY_A)) {
 					strP = directoryStringFromPos(entriesTable, pos);
-					if ( !(strstr(strP, "~")) ) {
+					if (!(strstr(strP, "~"))) {
 						if (strcmp(strP, "..") == 0) {
 							directoryBack(currentDir);
-						} else {
+						}
+						else {
 							if (strcmp(currentDir, "/")) {
 								strlcat(currentDir, "/", sizeof(currentDir));
 							}
@@ -247,15 +252,17 @@ const char *browseForFileType(const char *fileTypes) {
 						}
 						pos = 0;
 						oldPos = -1;
-					} else {
-						return ((const char *)strP+1);
+					}
+					else {
+						return strP+1;
 					}
 				}
 				if (oldPos != pos) {
 					oldPos = pos;
 					row = drawFileList(entriesTable, pos, dItemCount);
 					outputLogToScreen();
-				} else {
+				}
+				else {
 					drawLongFilename(entriesTable, pos, row);
 				}
 				if (pressed & (KEY_B)) {
@@ -331,7 +338,7 @@ static void directorySort(char **dirEntries, int count) {
 	for (j = 0; j < count; j++) {
 		dirT = 0;
 		for (i = 0; i < count; i++) {
-			if ( strcasecmp(dirEntries[i], dirEntries[i+1]) > 0) {
+			if (strcasecmp(dirEntries[i], dirEntries[i+1]) > 0) {
 				tmp = dirEntries[i];
 				dirEntries[i] = dirEntries[i+1];
 				dirEntries[i+1] = tmp;
