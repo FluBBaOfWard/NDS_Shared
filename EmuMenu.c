@@ -562,7 +562,7 @@ void drawSubItem(const char *str1, const char *str2) {
 		if (hilite) {
 			drawItemBackground(str1, drawRow, 1);
 		}
-		drawItems(str1, str2, 2, drawRow, hilite);
+		drawStrings(str1, str2, 2, drawRow, hilite);
 	}
 	menuItemRow++;
 }
