@@ -470,6 +470,18 @@ int drawItem(const char *str, int col, int row, int pal) {
 	return i+col;
 }
 
+int drawStrings(const char *str1, const char *str2, int col, int row, int pal) {
+	char str[48];
+	if (str2) {
+		strlMerge(str, str1, " ", sizeof(str));
+		strlMerge(str, str, str2, sizeof(str));
+	}
+	else {
+		strlcpy(str, str1, sizeof(str));
+	}
+	return drawItem(str, col, row, pal);
+}
+
 void drawTextLine(const char *str, int col, int row, int hiLite) {
 	u16 *here = map0sub+row*32;
 	int i = drawItem(str, col, row, hiLite);
@@ -544,20 +556,13 @@ void drawMenuItem(const char *str) {
 }
 
 void drawSubItem(const char *str1, const char *str2) {
-	char str[48];
 	int drawRow = (menuItemRow-menuYOffset)*2+5;
 	if (drawRow > 4) {
-		if (selected == menuItemRow) {
+		bool hilite = (selected == menuItemRow);
+		if (hilite) {
 			drawItemBackground(str1, drawRow, 1);
 		}
-		if (str2) {
-			strlMerge(str, str1, " ", sizeof(str));
-			strlMerge(str, str, str2, sizeof(str));
-		}
-		else {
-			strlcpy(str, str1, sizeof(str));
-		}
-		drawSubText(str, drawRow, (selected == menuItemRow));
+		drawItems(str1, str2, 2, drawRow, hilite);
 	}
 	menuItemRow++;
 }

@@ -47,6 +47,12 @@ void strlMerge(char *dst, const char *src1, const char *src2, int dstSize);
 void drawSubItem(const char *str1, const char *str2);
 void drawMenuItem(const char *str1);
 int drawItem(const char *str, int col, int row, int pal);
+
+/**
+ * Draw two strings on the same row after each other with a space inbetween.
+ */
+int drawStrings(const char *str1, const char *str2, int col, int row, int pal);
+
 void drawItemBackground(const char *str, int row, int sub);
 void drawTabs(void);
 void setupMenu(void);
