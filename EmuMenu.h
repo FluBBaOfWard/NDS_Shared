@@ -51,7 +51,7 @@ int drawItem(const char *str, int col, int row, int pal);
 /**
  * Draw two strings on the same row after each other with a space inbetween.
  */
-int drawStrings(const char *str1, const char *str2, int col, int row, int pal);
+void drawStrings(const char *str1, const char *str2, int col, int row, int pal);
 
 void drawItemBackground(const char *str, int row, int sub);
 void drawTabs(void);
