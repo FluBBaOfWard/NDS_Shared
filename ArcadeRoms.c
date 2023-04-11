@@ -28,15 +28,17 @@ bool loadACRoms(u8 *dest, const ArcadeGame *gameList, int gameNr, int gameCount,
 		const char *romName = game->roms[i].romName;
 		const int romSize = game->roms[i].romSize;
 		const u32 romCRC = game->roms[i].romCRC;
-		if (strcmp(romName, FILL0XFF) == 0) {
-			memset(dest, 0xFF, romSize);
-			dest += romSize;
-			continue;
-		}
-		if (strcmp(romName, FILL0X00) == 0) {
-			memset(dest, 0x00, romSize);
-			dest += romSize;
-			continue;
+		if (doLoad) {
+			if (strcmp(romName, FILL0XFF) == 0) {
+				memset(dest, 0xFF, romSize);
+				dest += romSize;
+				continue;
+			}
+			if (strcmp(romName, FILL0X00) == 0) {
+				memset(dest, 0x00, romSize);
+				dest += romSize;
+				continue;
+			}
 		}
 		if ( (file = fopen(romName, "r")) ) {
 			if (doLoad) {
