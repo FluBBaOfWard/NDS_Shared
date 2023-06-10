@@ -27,7 +27,7 @@
 	.align 2
 ;@----------------------------------------------------------------------------
 getTime:					;@ Out r0 = ??ssMMHH, r1 = ??DDMMYY
-	.type   getTime STT_FUNC
+	.type getTime STT_FUNC
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{lr}
 	bl updateTime
@@ -48,7 +48,7 @@ getTime:					;@ Out r0 = ??ssMMHH, r1 = ??DDMMYY
 	bx lr
 ;@----------------------------------------------------------------------------
 bin2BCD:		;@ Transform value to BCD
-	.type   bin2BCD STT_FUNC
+	.type bin2BCD STT_FUNC
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{r4}
 
@@ -107,7 +107,7 @@ bcdTable:
 
 ;@----------------------------------------------------------------------------
 getRandomNumber:			;@ r0 = Max value
-	.type   getRandomNumber STT_FUNC
+	.type getRandomNumber STT_FUNC
 ;@----------------------------------------------------------------------------
 	ldrd r2,r3,rndSeed0
 	tst r3,r3,lsr#1				;@ Top bit into Carry
@@ -158,7 +158,7 @@ scaleLoop:
 	b memcpy
 ;@----------------------------------------------------------------------------
 calculateFPS:					;@ fps output, r0-r3=used.
-	.type   calculateFPS STT_FUNC
+	.type calculateFPS STT_FUNC
 ;@----------------------------------------------------------------------------
 	ldrb r0,fpsCheck
 	subs r0,r0,#1
@@ -191,7 +191,7 @@ calculateFPS:					;@ fps output, r0-r3=used.
 	bx lr
 ;@----------------------------------------------------------------------------
 setLCDFPS:					;@ Write LCD FPS, r0=in fps, r0-r1=used.
-	.type   setLCDFPS STT_FUNC
+	.type setLCDFPS STT_FUNC
 ;@----------------------------------------------------------------------------
 	mov r1,#10
 	swi 0x090000				;@ Division r0/r1, r0=result, r1=remainder.
@@ -271,7 +271,7 @@ debugContinue:
 	bx lr
 ;@----------------------------------------------------------------------------
 r0OutputToEmulator:			;@ r0 = value
-	.type   r0OutputToEmulator STT_FUNC
+	.type r0OutputToEmulator STT_FUNC
 ;@----------------------------------------------------------------------------
 	mov r12,r12
 	b r0Continue
