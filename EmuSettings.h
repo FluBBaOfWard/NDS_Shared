@@ -28,9 +28,12 @@ extern "C" {
 // Misc settings that are not saved.
 #define UNSCALED		0	// Display types
 #define UNSCALED_NOAUTO	0
-#define UNSCALED_AUTO	1
-#define SCALED			2
-#define SCALED_SPRITES	3
+#define SCALED_1_1		0
+#define SCALED			1
+#define SCALED_FIT		1
+#define SCALED_ASPECT	2
+#define SCALED_SPRITES	4
+#define UNSCALED_AUTO	8
 
 #ifdef __cplusplus
 } // extern "C"
