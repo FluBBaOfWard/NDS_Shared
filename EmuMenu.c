@@ -226,22 +226,18 @@ bool isMenuOpen() {
 }
 
 void exitUI() {
-	exitGUI();
-	pauseEmulation = false;
-	setMuteSoundGUI();
 	if (settingsChanged && (emuSettings & AUTOSAVE_SETTINGS)) {
 		saveSettings();
 		settingsChanged = false;
 	}
-	if (emuSettings & MAIN_ON_BOTTOM) {
-		lcdMainOnBottom();
-	}
-
 	lastMainMenu = selectedMain;
 	if (lastMainMenu < 1) {
 		lastMainMenu = 1;
 	}
 
+	if (emuSettings & MAIN_ON_BOTTOM) {
+		lcdMainOnBottom();
+	}
 	if (emuSettings & POWER_SAVE_MENU) {
 		powerOff(POWER_2D_B);
 		if (emuSettings & MAIN_ON_BOTTOM) {
@@ -250,6 +246,9 @@ void exitUI() {
 			powerOff(PM_BACKLIGHT_BOTTOM);
 		}
 	}
+	exitGUI();
+	pauseEmulation = false;
+	setMuteSoundGUI();
 }
 
 /// This is during emulation.
