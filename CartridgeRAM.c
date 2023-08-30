@@ -10,6 +10,7 @@
 
 #include "nds.h"
 #include "CartridgeRAM.h"
+#include "ASMExtra.h"
 
 static void scSetMode(int mode) {
 	*(vu16 *)0x9FFFFFE = 0xA55A;
@@ -305,6 +306,7 @@ u32 cartRamSize() {
 vu16 *cartRamUnlock() {
 	sysSetCartOwner(BUS_OWNER_ARM9);
 	if (unlockFunc) {
+		enableSlot2Cache();
 		return unlockFunc();
 	}
 	return NULL;
@@ -314,5 +316,6 @@ void cartRamLock() {
 	sysSetCartOwner(BUS_OWNER_ARM9);
 	if (lockFunc) {
 		lockFunc();
+		disableSlot2Cache();
 	}
 }

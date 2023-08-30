@@ -49,6 +49,16 @@ void convertPalette(u16 *dest, const u8 *source, int length, int gamma);
  */
 void debugOutputToEmulator(const char *text);
 
+/**
+  * Enable Data caching for SLOT-2 ( region 3)
+ */
+void enableSlot2Cache(void);
+
+/**
+  * Disable Data caching for SLOT-2 ( region 3)
+ */
+void disableSlot2Cache(void);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

@@ -15,6 +15,8 @@
 	.global debugOutputToEmulator
 	.global r0OutputToEmulator
 	.global debugOutput_asm
+	.global enableSlot2Cache
+	.global disableSlot2Cache
 	.global bytecopy_
 	.global memclr_
 	.global memset_
@@ -292,6 +294,24 @@ debugOutput_asm:			;@ Input = r1. ptr to str.
 	blx debugOutput
 	ldmfd sp!,{r0-r3,pc}
 
+;@----------------------------------------------------------------------------
+enableSlot2Cache:
+	.type enableSlot2Cache STT_FUNC
+;@----------------------------------------------------------------------------
+	// Data cache for region 3
+	mrc	p15,0,r0,c2,c0,0
+	orr r0,r0,#(1 << 3)
+	mcr	p15,0,r0,c2,c0,0
+	bx lr
+;@----------------------------------------------------------------------------
+disableSlot2Cache:
+	.type disableSlot2Cache STT_FUNC
+;@----------------------------------------------------------------------------
+	// Data cache for region 3
+	mrc	p15,0,r0,c2,c0,0
+	bic r0,r0,#(1 << 3)
+	mcr	p15,0,r0,c2,c0,0
+	bx lr
 ;@----------------------------------------------------------------------------
 bytecopy_:					;@ void bytecopy(u8 *dst, u8 *src, int count)
 ;@----------------------------------------------------------------------------

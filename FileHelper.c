@@ -66,7 +66,10 @@ int loadROM(void *dest, const char *fileName, const int maxSize) {
 
 	getFileExtension(fileExt, fileName);
 	if (strstr(fileExt, ".zip")) {
-		if (loadFileTypeInZip(dest, fileName, FILEEXTENSIONS, maxSize) == 0) {
+		if (dest >= (void *)0x8000000 && dest < (void *)0xC000000) {
+			infoOutput("Can not load zip to Exp-RAM.");
+		}
+		else if (loadFileTypeInZip(dest, fileName, FILEEXTENSIONS, maxSize) == 0) {
 			size = cenHead.ucSize;
 			strlcpy(currentFilename, zipFilename, sizeof(currentFilename));
 		}
