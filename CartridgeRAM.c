@@ -179,7 +179,7 @@ static const RamStruct ramStruct[] = {
 	{DETECT_RAM, NULL, NULL, "Unknown", SLOT2SPD_SLOW},
 	{EZ3_RAM, ez3Unlock, ez3Lock, "EZ3", SLOT2SPD_FAST},
 	{EZO_RAM, ezoUnlock, ezoLock, "EZOmega", SLOT2SPD_FAST},
-	{SC_RAM, scUnlock, scLock, "SuperCard", SLOT2SPD_NORMAL},
+	{SC_RAM, scUnlock, scLock, "SuperCard", SLOT2SPD_SLOW},
 	{M3_RAM, m3Unlock, m3Lock, "M3", SLOT2SPD_NORMAL},
 	{OPERA_RAM, operaUnlock, operaLock, "Opera", SLOT2SPD_FAST},
 	{G6_RAM, g6Unlock, g6Lock, "G6", SLOT2SPD_NORMAL},
