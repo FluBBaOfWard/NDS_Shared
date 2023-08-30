@@ -5,7 +5,8 @@
 //  Created by Fredrik Ahlström on 2023-08-27.
 //  Copyright © 2023 Fredrik Ahlström. All rights reserved.
 //
-// Credits: Amadeus, Chishm, Cory1492, Lazy1, Pepsiman, Viruseb, Rick "Lick" Wong
+// Credits: Rick "Lick" Wong, Amadeus, Chishm, Cory1492, Lazy1, Pepsiman,
+// Viruseb, Damian Yerrick
 
 #include "nds.h"
 #include "CartridgeRAM.h"
@@ -147,6 +148,8 @@ static void ezoLock() {
 	ez3Lock();
 }
 
+//==========================================================
+
 typedef enum {
 	SLOT2SPD_SLOW   = 0x00, // (4,2)
 	SLOT2SPD_NORMAL = 0x14, // (3,1)
@@ -216,9 +219,7 @@ static bool ramTestNoLock() {
 	return false;
 }
 
-//==========================================================
 static void ramPrecalcSize() {
-//==========================================================
 	if (unlockFunc == 0 || lockFunc == 0) {
 		return;
 	}
@@ -236,9 +237,7 @@ static void ramPrecalcSize() {
 	lockFunc();
 }
 
-//==========================================================
 static bool findRamType() {
-//==========================================================
 	for (int i = 1; i < 7; i++) {
 		unlockFunc = ramStruct[i].unlockFunc;
 		lockFunc   = ramStruct[i].lockFunc;
@@ -257,8 +256,7 @@ static bool findRamType() {
 }
 
 //==========================================================
-RAM_TYPE ramInit(RAM_TYPE type) {
-//==========================================================
+RAM_TYPE cartRamInit(RAM_TYPE type) {
 	sysSetCartOwner(BUS_OWNER_ARM9);
 
 	switch(type) {
@@ -292,37 +290,27 @@ RAM_TYPE ramInit(RAM_TYPE type) {
 	return rType;
 }
 
-//==========================================================
-RAM_TYPE ramType() {
-//==========================================================
+RAM_TYPE cartRamType() {
 	return rType;
 }
 
-//==========================================================
-const char *ramTypeName() {
-//==========================================================
-	return ramStruct[(int)ramType].name;
+const char *cartRamName() {
+	return ramStruct[(int)rType].name;
 }
 
-//==========================================================
-u32 ramSize() {
-//==========================================================
+u32 cartRamSize() {
 	return rSize;
 }
 
-//==========================================================
-vu16 *ramUnlock() {
-//==========================================================
+vu16 *cartRamUnlock() {
 	sysSetCartOwner(BUS_OWNER_ARM9);
 	if (unlockFunc) {
 		return unlockFunc();
 	}
-	return 0;
+	return NULL;
 }
 
-//==========================================================
-void ramLock() {
-//==========================================================
+void cartRamLock() {
 	sysSetCartOwner(BUS_OWNER_ARM9);
 	if (lockFunc) {
 		lockFunc();

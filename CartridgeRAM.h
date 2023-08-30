@@ -24,23 +24,36 @@ typedef enum {
 	G6_RAM,
 } RAM_TYPE;
 
-/** Call this before the others */
-RAM_TYPE ramInit(RAM_TYPE);
+/**
+ * Call this before any other functions.
+ * When called with RAM_TYPE "DETECT_RAM" it will try to figure out which type
+ * of expansion is in SLOT-2. It will also try to figure out how much RAM there is.
+ * @param The type of RAM device you want to initialize, use "DETECT_RAM" to
+ * let the code figure it out.
+ * @return The type of RAM in SLOT-2, returns DETECT_RAM if none was found.
+ */
+RAM_TYPE cartRamInit(RAM_TYPE);
 
-/** Returns the type of the RAM device */
-RAM_TYPE ramType();
+/**
+ * Returns the type of the RAM device as figured out from running cartRamInit.
+ * @return The type of the RAM device.
+ */
+RAM_TYPE cartRamType();
 
 /** Returns the type of the RAM device in a string */
-const char *ramTypeString();
+const char *cartRamName();
 
 /** Returns the total amount of RAM in bytes */
-u32 ramSize();
+u32 cartRamSize();
 
-/** Unlocks the RAM and returns a pointer to the begining */
-vu16 *ramUnlock();
+/**
+ * Unlocks the RAM and returns a pointer to the beginning of the RAM.
+ * @return A pointer to the RAM or NULL if there is no RAM.
+ */
+vu16 *cartRamUnlock();
 
-/** Locks the RAM */
-void ramLock();
+/** Tries to lock the RAM, this may not work on all kinds of carts. */
+void cartRamLock();
 
 #ifdef __cplusplus
 } // extern "C"
