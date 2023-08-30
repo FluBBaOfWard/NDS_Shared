@@ -66,7 +66,7 @@ int loadROM(void *dest, const char *fileName, const int maxSize) {
 
 	getFileExtension(fileExt, fileName);
 	if (strstr(fileExt, ".zip")) {
-		if ((loadFileTypeInZip(dest, fileName, FILEEXTENSIONS, maxSize)) == 0) {
+		if (loadFileTypeInZip(dest, fileName, FILEEXTENSIONS, maxSize) == 0) {
 			size = cenHead.ucSize;
 			strlcpy(currentFilename, zipFilename, sizeof(currentFilename));
 		}
