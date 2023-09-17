@@ -298,7 +298,7 @@ debugOutput_asm:			;@ Input = r1. ptr to str.
 enableSlot2Cache:
 	.type enableSlot2Cache STT_FUNC
 ;@----------------------------------------------------------------------------
-	// Data cache for region 3
+	// Enable Data Cache for region 3 (probably specific to DevkitARM).
 	mrc	p15,0,r0,c2,c0,0
 	orr r0,r0,#(1 << 3)
 	mcr	p15,0,r0,c2,c0,0
@@ -307,7 +307,7 @@ enableSlot2Cache:
 disableSlot2Cache:
 	.type disableSlot2Cache STT_FUNC
 ;@----------------------------------------------------------------------------
-	// Data cache for region 3
+	// Disable Data Cache for region 3 (probably specific to DevkitARM).
 	mrc	p15,0,r0,c2,c0,0
 	bic r0,r0,#(1 << 3)
 	mcr	p15,0,r0,c2,c0,0

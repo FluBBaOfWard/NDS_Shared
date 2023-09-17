@@ -16,11 +16,17 @@ extern "C" {
 
 typedef enum {
 	DETECT_RAM=0,
+	/** EZ-FLASH III */
 	EZ3_RAM,
+	/** EZ-FLASH Omega */
 	EZO_RAM,
+	/** Super Card */
 	SC_RAM,
+	/** GBA Movie Player M3 */
 	M3_RAM,
+	/** Nintendo Memory Expansion Pack for Opera browser */
 	OPERA_RAM,
+	/** G6 Flash */
 	G6_RAM,
 } RAM_TYPE;
 

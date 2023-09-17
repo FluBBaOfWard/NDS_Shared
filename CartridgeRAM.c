@@ -39,7 +39,7 @@ static void m3SetMode(u16 mode) {
 	tmp = *(vu16 *)0x8800612;
 	tmp = *(vu16 *)0x8000000;
 	tmp = *(vu16 *)0x8801B66;
-	tmp = *(vu16 *)(0x8400000 + (mode << 1));
+	tmp = *(vu16 *)(0x8800000 + (mode << 1));
 	tmp = *(vu16 *)0x800080E;
 	tmp = *(vu16 *)0x8000000;
 	tmp = *(vu16 *)0x80001E4;
@@ -206,7 +206,7 @@ static bool ramTest() {
 }
 
 /**
- * Just tests that the first 16bit address can be written to.
+ * Just tests that the first 16bit address can be written to after unlock.
  * @return true if a write succeded.
  */
 static bool ramTestNoLock() {
