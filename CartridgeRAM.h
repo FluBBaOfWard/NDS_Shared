@@ -18,6 +18,8 @@ typedef enum {
 	DETECT_RAM=0,
 	/** EZ-FLASH III */
 	EZ3_RAM,
+	/** EZ-FLASH 3In1 */
+	EZ3IN1_RAM,
 	/** EZ-FLASH Omega */
 	EZO_RAM,
 	/** Super Card */

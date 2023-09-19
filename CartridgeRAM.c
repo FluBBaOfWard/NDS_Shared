@@ -12,6 +12,8 @@
 #include "CartridgeRAM.h"
 #include "ASMExtra.h"
 
+//==========================================================
+
 static void scSetMode(int mode) {
 	*(vu16 *)0x9FFFFFE = 0xA55A;
 	*(vu16 *)0x9FFFFFE = 0xA55A;
@@ -118,8 +120,6 @@ static void ezSetRomPage(u16 page) {
 	ezCommand(0x9880000, page);
 }
 
-//ezSetRomPage(0x0160);       // SetRompage (0x160)
-
 /**
  * Flash/NOR/PSRAM Write Open/Close
  * Open = 0x1500 (0xA500?, used on PCEAdvance... )
@@ -140,6 +140,17 @@ static void ez3Lock() {
 	ezSetNorWrite(0xD200); // Close Write
 }
 
+static vu16 *ez3In1Unlock() {
+	ezSetNorWrite(0xD200); // Close Write
+	ezSetRomPage(0x0160);  // SetRompage (0x160)
+	ezSetNorWrite(0x1500); // Open Write
+	return (vu16 *)0x8400000;
+}
+
+static void ez3In1Lock() {
+	ez3Lock();
+}
+
 static vu16 *ezoUnlock() {
 	ez3Unlock();
 	return (vu16 *)0x8800000;
@@ -155,7 +166,7 @@ typedef enum {
 	SLOT2SPD_SLOW   = 0x00, // (4,2)
 	SLOT2SPD_NORMAL = 0x14, // (3,1)
 	SLOT2SPD_FAST   = 0x18, // (2,1)
-	SLOT2SPD_MASK = 0x001F
+	SLOT2SPD_MASK   = 0x1F
 } SLOT2SPD;
 
 void setSlot2Speed(SLOT2SPD waitStates) {
@@ -178,7 +189,8 @@ static RAM_TYPE rType = DETECT_RAM;
 
 static const RamStruct ramStruct[] = {
 	{DETECT_RAM, NULL, NULL, "Unknown", SLOT2SPD_SLOW},
-	{EZ3_RAM, ez3Unlock, ez3Lock, "EZ3", SLOT2SPD_FAST},
+	{EZ3_RAM, ez3Unlock, ez3Lock, "EZF3", SLOT2SPD_FAST},
+	{EZ3IN1_RAM, ez3In1Unlock, ez3In1Lock, "EZF3In1", SLOT2SPD_FAST},
 	{EZO_RAM, ezoUnlock, ezoLock, "EZOmega", SLOT2SPD_FAST},
 	{SC_RAM, scUnlock, scLock, "SuperCard", SLOT2SPD_SLOW},
 	{M3_RAM, m3Unlock, m3Lock, "M3", SLOT2SPD_NORMAL},
@@ -239,13 +251,15 @@ static void ramPrecalcSize() {
 }
 
 static bool findRamType() {
+	disableSlot2Cache();
 	for (int i = 1; i < 7; i++) {
 		unlockFunc = ramStruct[i].unlockFunc;
 		lockFunc   = ramStruct[i].lockFunc;
 		rType      = ramStruct[i].type;
 		if ((rType == OPERA_RAM
-			|| rType == EZ3_RAM
-			|| rType == EZO_RAM)
+			 || rType == EZ3_RAM
+			 || rType == EZ3IN1_RAM
+			 || rType == EZO_RAM)
 			&& ramTestNoLock()) {
 			return true;
 		}
@@ -304,18 +318,18 @@ u32 cartRamSize() {
 }
 
 vu16 *cartRamUnlock() {
-	sysSetCartOwner(BUS_OWNER_ARM9);
 	if (unlockFunc) {
-		enableSlot2Cache();
+		sysSetCartOwner(BUS_OWNER_ARM9);
+		disableSlot2Cache();
 		return unlockFunc();
 	}
 	return NULL;
 }
 
 void cartRamLock() {
-	sysSetCartOwner(BUS_OWNER_ARM9);
 	if (lockFunc) {
-		lockFunc();
+		sysSetCartOwner(BUS_OWNER_ARM9);
 		disableSlot2Cache();
+		lockFunc();
 	}
 }
