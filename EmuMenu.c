@@ -254,7 +254,7 @@ void exitUI() {
 /// This is during emulation.
 void nullUI() {
 	int key = getInput();
-	if ((EMUinput & (KEY_L|KEY_R)) == (KEY_L|KEY_R)) {
+	if (EMUinput & KEY_OPEN_MENU) {
 		openMenu();
 		return;
 	}
@@ -289,7 +289,7 @@ void subUI() {
 			setSelectedMain(selectedMain+1);
 		}
 	}
-	if (key & (KEY_A+KEY_UP+KEY_DOWN+KEY_LEFT+KEY_RIGHT+KEY_TOUCH)) {
+	if (key & (KEY_A|KEY_UP|KEY_DOWN|KEY_LEFT|KEY_RIGHT|KEY_TOUCH)) {
 		redrawUI();
 	}
 	updateInfoLog();
@@ -304,13 +304,11 @@ int getMenuInput(int itemCount) {
 
 //---------------------------------------------------------------------------------
 int getInput() {
-	int dpad;
+	EMUinput = convertInput(keysHeld());
+
 	int keyHit = keysDown();	// Buttons pressed this loop
-
-	EMUinput = keysHeld();
-
-	dpad = keysDownRepeat() & (KEY_UP+KEY_DOWN+KEY_LEFT+KEY_RIGHT);
-	return dpad|(keyHit & (KEY_A+KEY_B+KEY_START+KEY_L+KEY_R+KEY_TOUCH));
+	int dpad = keysDownRepeat() & (KEY_UP|KEY_DOWN|KEY_LEFT|KEY_RIGHT);
+	return dpad|(keyHit & (KEY_A|KEY_B|KEY_X|KEY_Y|KEY_START|KEY_L|KEY_R|KEY_TOUCH));
 }
 
 //---------------------------------------------------------------------------------

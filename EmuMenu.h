@@ -7,6 +7,8 @@ extern "C" {
 
 #define ARRSIZE(xxxx) (sizeof((xxxx))/sizeof((xxxx)[0]))
 
+#define KEY_OPEN_MENU BIT(30)  // Key to open menu
+
 typedef void (*fptr)(void);
 
 /// Autofire for button A
