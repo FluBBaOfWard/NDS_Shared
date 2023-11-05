@@ -59,7 +59,7 @@ bool loadACRoms(u8 *dest, const ArcadeGame *gameList, int gameNr, int gameCount,
 		}
 		else {
 			for (j=0; j<gameCount; j++) {
-				strlMerge(zipSubName, gameList[j].gameName, ".zip", sizeof(zipName));
+				strlMerge(zipSubName, gameList[j].gameName, ".zip", sizeof(zipSubName));
 				if (!findFileWithCRC32InZip(zipSubName, romCRC)) {
 					if (doLoad) {
 						loadFileWithCRC32InZip(dest, zipSubName, romCRC, romSize);
