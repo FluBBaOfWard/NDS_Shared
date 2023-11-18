@@ -101,6 +101,19 @@ static void g6Lock() {
 
 //==========================================================
 
+static vu16 *edUnlock() {
+	*(vu16 *)0x9FC00B4 = 0x00A5; // Unlock
+	*(vu16 *)0x9FC0000 = 0x6; // Unmap control registers, map PSRAM, allow writing
+	return (vu16 *)0x8000000;
+}
+
+static void edLock() {
+	*(vu16 *)0x9FC00B4 = 0x00A5; // Unlock
+	*(vu16 *)0x9FC0000 = 0x0; // Unmap control registers, unmap PSRAM
+}
+
+//==========================================================
+
 static void ezCommand(u32 adr, u16 value) {
 	*(vu16 *)0x9FE0000 = 0xD200;
 	*(vu16 *)0x8000000 = 0x1500;
@@ -196,6 +209,7 @@ static const RamStruct ramStruct[] = {
 	{M3_RAM, m3Unlock, m3Lock, "M3", SLOT2SPD_NORMAL},
 	{OPERA_RAM, operaUnlock, operaLock, "Opera", SLOT2SPD_FAST},
 	{G6_RAM, g6Unlock, g6Lock, "G6", SLOT2SPD_NORMAL},
+	{ED_RAM, edUnlock, edLock, "EverDrive", SLOT2SPD_FAST},
 };
 
 /**
@@ -252,11 +266,12 @@ static void ramPrecalcSize() {
 
 static bool findRamType() {
 	disableSlot2Cache();
-	for (int i = 1; i < 7; i++) {
+	for (int i = 1; i < 8; i++) {
 		unlockFunc = ramStruct[i].unlockFunc;
 		lockFunc   = ramStruct[i].lockFunc;
 		rType      = ramStruct[i].type;
 		if ((rType == OPERA_RAM
+			 || rType == ED_RAM
 			 || rType == EZ3_RAM
 			 || rType == EZ3IN1_RAM
 			 || rType == EZO_RAM)
@@ -279,6 +294,7 @@ RAM_TYPE cartRamInit(RAM_TYPE type) {
 		case M3_RAM:
 		case OPERA_RAM:
 		case G6_RAM:
+		case ED_RAM:
 		case EZ3_RAM:
 		case EZO_RAM:
 			unlockFunc = ramStruct[(int)type].unlockFunc;

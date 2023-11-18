@@ -30,6 +30,8 @@ typedef enum {
 	OPERA_RAM,
 	/** G6 Flash */
 	G6_RAM,
+	/** EverDrive GBA */
+	ED_RAM,
 } RAM_TYPE;
 
 /**
