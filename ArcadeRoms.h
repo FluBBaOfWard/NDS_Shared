@@ -9,6 +9,7 @@ extern "C" {
 
 #define FILL0X00 "FILL0X00"
 #define FILL0XFF "FILL0XFF"
+#define ROM_REGION "ROMREGION"
 
 typedef struct {				// (ArcadeRom)
 	const char *const romName;	// Rom name.

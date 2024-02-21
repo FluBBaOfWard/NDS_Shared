@@ -42,6 +42,12 @@ bool loadACRoms(u8 *dest, const ArcadeGame *gameList, int gameNr, int gameCount,
 			}
 			continue;
 		}
+		if (strcmp(romName, ROM_REGION) == 0) {
+			if (doLoad) {
+				*(u32 *)romCRC = (u32)dest;
+			}
+			continue;
+		}
 		if ( (file = fopen(romName, "r")) ) {
 			if (doLoad) {
 				fread(dest, 1, romSize, file);
