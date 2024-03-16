@@ -31,6 +31,8 @@ extern int emuSettings;
 extern int sleepTime;
 /// This is the current row in the menu.
 extern int selected;
+/// YOffset for menus with many items.
+extern int menuYOffset;
 
 void guiRunLoop(void);
 int getInput(void);

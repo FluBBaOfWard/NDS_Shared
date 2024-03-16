@@ -123,6 +123,19 @@
 // In large bitmap modes, this is not used
 #define DISPLAY_SCREEN_BASE(n) (((n)&7)<<27)
 
+/*! \brief The shift to apply to map base when storing it in a background control register */
+#define MAP_BASE_SHIFT 8
+/*! \brief The shift to apply to tile base when storing it in a background control register */
+#define TILE_BASE_SHIFT 2
+/*! \brief Macro to set the tile base in background control */
+#define BG_TILE_BASE(base) ((base) << TILE_BASE_SHIFT)
+/*! \brief Macro to set the map base in background control */
+#define BG_MAP_BASE(base)  ((base) << MAP_BASE_SHIFT)
+/*! \brief Macro to set the graphics base in background control */
+#define BG_BMP_BASE(base)  ((base) << MAP_BASE_SHIFT)
+/*! \brief Macro to set the priority in background control */
+#define BG_PRIORITY(n) (n)
+
 #define BG_SIZE(m)		((m<<14))
 
 #define BG_SIZE_0		BG_SIZE(0)	/*!< Map Size 256x256 */
@@ -131,20 +144,19 @@
 #define BG_SIZE_3		BG_SIZE(3)	/*!< Map Size 512x512 */
 
 /*---------------------------------------------------------------------------------
-	Width and height of a text map can (and probably should)
-	be controlled separately.
+	Width and height of a text map
 ---------------------------------------------------------------------------------*/
-#define BG_WID_32 BG_SIZE_0
-#define BG_WID_64 BG_SIZE_1
-#define BG_HT_32  BG_SIZE_0
-#define BG_HT_64  BG_SIZE_2
+#define BG_32x32 BG_SIZE_0
+#define BG_64x32 BG_SIZE_1
+#define BG_32x64 BG_SIZE_2
+#define BG_64x64 BG_SIZE_3
 //---------------------------------------------------------------------------------
 // Symbolic names for the rot/scale map sizes
 //---------------------------------------------------------------------------------
-#define ROTBG_SIZE_16  BG_SIZE_0
-#define ROTBG_SIZE_32  BG_SIZE_1
-#define ROTBG_SIZE_64  BG_SIZE_2
-#define ROTBG_SIZE_128 BG_SIZE_3
+#define BG_RS_16x16   BG_SIZE_0
+#define BG_RS_32x32   BG_SIZE_1
+#define BG_RS_64x64   BG_SIZE_2
+#define BG_RS_128x128 BG_SIZE_3
 
 #define TEXTBG_SIZE_256x256    BG_SIZE_0
 #define TEXTBG_SIZE_512x256    BG_SIZE_1
@@ -156,6 +168,11 @@
 #define ROTBG_SIZE_512x512    BG_SIZE_2
 #define ROTBG_SIZE_1024x1024  BG_SIZE_3
 
+#define BG_MOSAIC_ON   (1 << 6)
+#define BG_MOSAIC_OFF  (0)
+
+#define BG_COLOR_256 (1 << 7)
+#define BG_COLOR_16  (0)
 
 // Display control registers
 #define	REG_BASE			0x04000000

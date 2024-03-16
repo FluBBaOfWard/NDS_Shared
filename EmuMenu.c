@@ -61,7 +61,7 @@ static int selectedMain = 0;
 static int lastMainMenu = 1;
 static int menuItemRow = 0;
 static int lineRepeat = 0;
-static int menuYOffset = 0;
+int menuYOffset = 0;
 // How deep we are in the menu tree
 static int menuLevel = 0;
 static char menuPath[MENU_MAX_DEPTH];
