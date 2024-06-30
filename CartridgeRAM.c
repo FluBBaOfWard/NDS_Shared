@@ -14,6 +14,10 @@
 
 //==========================================================
 
+/**
+ * Set mode on SuperCard
+ * @param mode The mode to set, 1=RAM R/O, 3=Media, 5=RAM R/W.
+ */
 static void scSetMode(int mode) {
 	*(vu16 *)0x9FFFFFE = 0xA55A;
 	*(vu16 *)0x9FFFFFE = 0xA55A;
@@ -22,16 +26,20 @@ static void scSetMode(int mode) {
 }
 
 static vu16 *scUnlock() {
-	scSetMode(0x5); // RAM_RW
+	scSetMode(5); // RAM_RW
 	return (vu16 *)0x8000000;
 }
 
 static void scLock() {
-	scSetMode(0x3); // MEDIA
+	scSetMode(1); // RAM_RO
 }
 
 //==========================================================
 
+/**
+ * Set mode on GBA Movie Player M3
+ * @param mode The mode to set, 3=Media, 4=ROM, 6=RAM R/W.
+ */
 static void m3SetMode(u16 mode) {
 	vu16 tmp;
 	tmp = *(vu16 *)0x8E00002;
@@ -72,6 +80,10 @@ static void operaLock() {
 
 //==========================================================
 
+/**
+ * Set mode on G6 Flash
+ * @param mode The mode to set, 3=Media, 6=RAM R/W.
+ */
 static void g6SetMode(u16 mode) {
 	vu16 tmp;
 	tmp = *(vu16 *)0x9000000;
@@ -103,13 +115,13 @@ static void g6Lock() {
 
 static vu16 *edUnlock() {
 	*(vu16 *)0x9FC00B4 = 0x00A5; // Unlock
-	*(vu16 *)0x9FC0000 = 0x6; // Unmap control registers, map PSRAM, allow writing
+	*(vu16 *)0x9FC0000 = 6; // Unmap control registers, map PSRAM, allow writing
 	return (vu16 *)0x8000000;
 }
 
 static void edLock() {
 	*(vu16 *)0x9FC00B4 = 0x00A5; // Unlock
-	*(vu16 *)0x9FC0000 = 0x0; // Unmap control registers, unmap PSRAM
+	*(vu16 *)0x9FC0000 = 0; // Unmap control registers, unmap PSRAM
 }
 
 //==========================================================
@@ -175,6 +187,20 @@ static void ezoLock() {
 
 //==========================================================
 
+#define SCFG_EXT_RAM_DEBUG      BIT(14)
+#define SCFG_EXT_RAM_TWL        BIT(15)
+
+static vu16 *n3dsUnlock() {
+	REG_SCFG_EXT = REG_SCFG_EXT | SCFG_EXT_RAM_DEBUG | SCFG_EXT_RAM_TWL;
+	return (vu16 *)0xD000000;
+}
+
+static void n3dsLock() {
+	REG_SCFG_EXT = REG_SCFG_EXT & ~SCFG_EXT_RAM_DEBUG;
+}
+
+//==========================================================
+
 typedef enum {
 	SLOT2SPD_SLOW   = 0x00, // (4,2)
 	SLOT2SPD_NORMAL = 0x14, // (3,1)
@@ -210,6 +236,7 @@ static const RamStruct ramStruct[] = {
 	{OPERA_RAM, operaUnlock, operaLock, "Opera", SLOT2SPD_FAST},
 	{G6_RAM, g6Unlock, g6Lock, "G6", SLOT2SPD_NORMAL},
 	{ED_RAM, edUnlock, edLock, "EverDrive", SLOT2SPD_FAST},
+	{N3DS_RAM, n3dsUnlock, n3dsLock, "3DS", SLOT2SPD_NORMAL},
 };
 
 /**
@@ -247,7 +274,7 @@ static bool ramTestNoLock() {
 }
 
 static void ramPrecalcSize() {
-	if (unlockFunc == 0 || lockFunc == 0) {
+	if (unlockFunc == NULL || lockFunc == NULL) {
 		return;
 	}
 	vu16 *ram = unlockFunc();
@@ -266,7 +293,12 @@ static void ramPrecalcSize() {
 
 static bool findRamType() {
 	disableSlot2Cache();
-	for (int i = 1; i < 8; i++) {
+	int start = 1;
+	if (isDSiMode()) {
+		// Don't access cart space on DSi/3DS.
+		start = 9;
+	}
+	for (int i = start; i < 10; i++) {
 		unlockFunc = ramStruct[i].unlockFunc;
 		lockFunc   = ramStruct[i].lockFunc;
 		rType      = ramStruct[i].type;
@@ -274,7 +306,9 @@ static bool findRamType() {
 			 || rType == ED_RAM
 			 || rType == EZ3_RAM
 			 || rType == EZ3IN1_RAM
-			 || rType == EZO_RAM)
+			 || rType == EZO_RAM
+			 || rType == N3DS_RAM
+			 )
 			&& ramTestNoLock()) {
 			return true;
 		}
@@ -297,6 +331,7 @@ RAM_TYPE cartRamInit(RAM_TYPE type) {
 		case ED_RAM:
 		case EZ3_RAM:
 		case EZO_RAM:
+		case N3DS_RAM:
 			unlockFunc = ramStruct[(int)type].unlockFunc;
 			lockFunc   = ramStruct[(int)type].lockFunc;
 			rType      = type;
