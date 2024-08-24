@@ -113,11 +113,15 @@ bool loadDeviceState(const char *folderName) {
 		if ((statePtr = malloc(stateSize))) {
 			cls(0);
 			drawText("        Loading state...", 11, 0);
-			fread(statePtr, 1, stateSize, file);
-			unpackState(statePtr);
+			if (fread(statePtr, 1, stateSize, file) == stateSize) {
+				unpackState(statePtr);
+				infoOutput("Loaded state.");
+				err = false;
+			}
+			else {
+				infoOutput("Wrong size of state.");
+			}
 			free(statePtr);
-			err = false;
-			infoOutput("Loaded state.");
 		}
 		else {
 			infoOutput("Couldn't alloc mem for state.");
