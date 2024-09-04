@@ -543,23 +543,30 @@ void strlMerge(char *dst, const char *src1, const char *src2, int dstSize) {
 
 void drawMenuItem(const char *str) {
 	int drawRow = (menuItemRow-menuYOffset)*2+5;
-	if (drawRow > 4) {
-		if (selected == menuItemRow) {
+	if (drawRow > 4 && drawRow < 24) {
+		bool hilite = (selected == menuItemRow);
+		if (hilite) {
 			drawItemBackground(str, drawRow, 0);
 		}
-		drawMenuText(str, drawRow, (selected == menuItemRow));
+		drawMenuText(str, drawRow, hilite);
+		if (drawRow == 21) {
+			drawMenuText("", 23, false);
+		}
 	}
 	menuItemRow++;
 }
 
 void drawSubItem(const char *str1, const char *str2) {
 	int drawRow = (menuItemRow-menuYOffset)*2+5;
-	if (drawRow > 4) {
+	if (drawRow > 4 && drawRow < 24) {
 		bool hilite = (selected == menuItemRow);
 		if (hilite) {
 			drawItemBackground(str1, drawRow, 1);
 		}
 		drawStrings(str1, str2, 2, drawRow, hilite);
+		if (drawRow == 21) {
+			drawMenuText("", 23, false);
+		}
 	}
 	menuItemRow++;
 }
