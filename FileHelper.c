@@ -35,6 +35,7 @@ static void directoryBack(char *path);
 int fatAvailable = 0;
 static char *dTable = NULL;
 static char **entriesTable = NULL;
+static const char *fakeDirName;
 /** Current number of entries in the directory table */
 static int dItemCount = 0;
 static int dCacheLeft = 0;
@@ -251,6 +252,7 @@ static const char *selectInDirectory(bool resetPos) {
 //---------------------------------------------------------------------------------
 const char *browseDirectory() {
 	cls(0);
+	drawText(fakeDirName, 0, 0);
 	if (dItemCount > 0) {
 		const char *strP = selectInDirectory(true);
 		if (strstr(strP, "~")) {
@@ -385,10 +387,11 @@ static void directorySort(char **dirEntries, int count) {
 	}
 }
 
-void initBrowse() {
+void initBrowse(const char *dirName) {
 	if (dTable == NULL) {
 		dTable = malloc(DIRECTORY_CACHE_SIZE);
 	}
+	fakeDirName = dirName;
 	entriesTable = directoryInit(dTable);
 	dirCRC32 = 0;
 }

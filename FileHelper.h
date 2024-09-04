@@ -75,7 +75,12 @@ void setFileExtension(char *dest, const char *fileName, const char *newExt, int 
  */
 const char *browseForFileType(const char *fileTypes);
 
-void initBrowse(void);
+/**
+ * Inits the directory structs, use browseAddFilename to add entries
+ * that later can be browsed.
+ * @param dirName: Label at the top of the screen.
+ */
+void initBrowse(const char *dirName);
 
 /**
  * A file browser that shows files in the dirEntries.
