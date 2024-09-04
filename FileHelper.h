@@ -5,13 +5,13 @@
 extern "C" {
 #endif
 
-#define FILENAMEMAXLENGTH (128)
-#define FILEPATHMAXLENGTH (256)
+#define FILENAME_MAX_LENGTH (128)
+#define FILEPATH_MAX_LENGTH (256)
 
 extern int fatAvailable;
 
-extern char currentFilename[FILENAMEMAXLENGTH];
-extern char currentDir[FILEPATHMAXLENGTH];
+extern char currentFilename[FILENAME_MAX_LENGTH];
+extern char currentDir[FILEPATH_MAX_LENGTH];
 extern const char *const spinner[4];
 
 int initFileHelper();
@@ -75,6 +75,14 @@ void setFileExtension(char *dest, const char *fileName, const char *newExt, int 
  */
 const char *browseForFileType(const char *fileTypes);
 
+void initBrowse(void);
+
+/**
+ * A file browser that shows files in the dirEntries.
+ * @return The selected files name, or NULL if none selected.
+ */
+const char *browseDirectory();
+
 /**
  * Gets the file name at the specified position.
  * @param  **dirEntries: Directory entries.
@@ -82,6 +90,8 @@ const char *browseForFileType(const char *fileTypes);
  * @return Selected file name or NULL if out of bounds.
  */
 const char *directoryStringFromPos(char **dirEntries, int pos);
+
+const char *browseAddFilename(const char *fileName);
 
 #ifdef __cplusplus
 } // extern "C"

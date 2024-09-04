@@ -12,8 +12,8 @@
 #include "../Main.h"
 #include "../FileHandling.h"
 
-static const int directoryCacheSize = 0x8000;
-static const int directoryMaxEntries = 768;
+static const int DIRECTORY_CACHE_SIZE = 0x8000;
+static const int DIRECTORY_MAX_ENTRIES = 768;
 
 /**
  * Lists a directory, filtering according to file types.
@@ -33,16 +33,16 @@ static void directorySort(char **dirEntries, int count);
 static void directoryBack(char *path);
 
 int fatAvailable = 0;
-static char *dTable = 0;
-static char **entriesTable = 0;
+static char *dTable = NULL;
+static char **entriesTable = NULL;
 /** Current number of entries in the directory table */
 static int dItemCount = 0;
 static int dCacheLeft = 0;
 static unsigned int dirCRC32 = 0;
 static char spinnerCount = 0;
 
-char currentFilename[FILENAMEMAXLENGTH];
-char currentDir[FILEPATHMAXLENGTH];
+char currentFilename[FILENAME_MAX_LENGTH];
+char currentDir[FILEPATH_MAX_LENGTH];
 
 const char *const spinner[4]={"\\","|","/","-"};
 //---------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ bool loadDeviceState(const char *folderName) {
 	bool err = true;
 	FILE *file;
 	u32 *statePtr;
-	char stateName[FILENAMEMAXLENGTH];
+	char stateName[FILENAME_MAX_LENGTH];
 
 	if (findFolder(folderName)) {
 		return err;
@@ -139,7 +139,7 @@ bool saveDeviceState(const char *folderName) {
 	bool err = true;
 	FILE *file;
 	u32 *statePtr;
-	char stateName[FILENAMEMAXLENGTH];
+	char stateName[FILENAME_MAX_LENGTH];
 
 	if (findFolder(folderName)) {
 		return err;
@@ -169,7 +169,7 @@ bool saveDeviceState(const char *folderName) {
 }
 
 int findFolder(const char *folderName) {
-	char tempString[FILEPATHMAXLENGTH];
+	char tempString[FILEPATH_MAX_LENGTH];
 	int retValue = 0;
 	if (!chdir(folderName)) {
 		return retValue;
@@ -216,66 +216,86 @@ void setFileExtension(char *dest, const char *fileName, const char *newExt, int 
 	strlcat(dest, newExt, dstSize);
 }
 
+static const char *selectInDirectory(bool resetPos) {
+	static int pos = 0;
+	if (resetPos) {
+		pos = 0;
+	}
+	if (pos >= dItemCount) {
+		pos = dItemCount-1;
+	}
+	int row = 0, oldPos = -1;
+	while (1) {
+		waitVBlank();
+		int pressed = getInput();
+		pos = getMenuPos(pressed, pos, dItemCount);
+		if (pressed & (KEY_A)) {
+			return directoryStringFromPos(entriesTable, pos);
+		}
+		if (oldPos != pos) {
+			oldPos = pos;
+			row = drawFileList(entriesTable, pos, dItemCount);
+			outputLogToScreen();
+		}
+		else {
+			drawLongFilename(entriesTable, pos, row);
+		}
+		if (pressed & (KEY_B)) {
+			break;
+		}
+		updateInfoLog();
+	}
+	return NULL;
+}
+
+//---------------------------------------------------------------------------------
+const char *browseDirectory() {
+	cls(0);
+	if (dItemCount > 0) {
+		const char *strP = selectInDirectory(true);
+		if (strstr(strP, "~")) {
+			return strP+1;
+		}
+	}
+	return NULL;
+}
+
 //---------------------------------------------------------------------------------
 const char *browseForFileType(const char *fileTypes) {
-	static int pos = 0;
-	int row = 0, oldPos = -1;
-	const char *strP;
-	int pressed = 0;
-
-	if (fatAvailable) {
-		cls(0);
-		if (dTable == 0) {
-			dTable = malloc(directoryCacheSize);
-		}
-		dItemCount = getDirectory(dTable, currentDir, fileTypes);
-		if (dItemCount == -1) {
-			directoryBack(currentDir);
-		}
-		if (dItemCount > 0) {
-			if (pos >= dItemCount) {
-				pos = dItemCount-1;
-			}
-			while (1) {
-				waitVBlank();
-				pressed = getInput();
-				pos = getMenuPos(pressed, pos, dItemCount);
-				if (pressed & (KEY_A)) {
-					strP = directoryStringFromPos(entriesTable, pos);
-					if (!(strstr(strP, "~"))) {
-						if (strcmp(strP, "..") == 0) {
-							directoryBack(currentDir);
-						}
-						else {
-							if (strcmp(currentDir, "/")) {
-								strlcat(currentDir, "/", sizeof(currentDir));
-							}
-							strlcat(currentDir, strP, sizeof(currentDir));
-						}
-						dItemCount = getDirectory(dTable, currentDir, fileTypes);
-						if (dItemCount == -1) {
-							directoryBack(currentDir);
-							dItemCount = 0;
-						}
-						pos = 0;
-						oldPos = -1;
-					}
-					else {
-						return strP+1;
-					}
-				}
-				if (oldPos != pos) {
-					oldPos = pos;
-					row = drawFileList(entriesTable, pos, dItemCount);
-					outputLogToScreen();
+	if (!fatAvailable) {
+		return NULL;
+	}
+	cls(0);
+	if (dTable == NULL) {
+		dTable = malloc(DIRECTORY_CACHE_SIZE);
+	}
+	dItemCount = getDirectory(dTable, currentDir, fileTypes);
+	if (dItemCount == -1) {
+		directoryBack(currentDir);
+	}
+	if (dItemCount > 0) {
+		const char *strP;
+		bool restart = false;
+		while ((strP = selectInDirectory(restart)) != NULL ) {
+			if (!strstr(strP, "~")) {
+				if (strcmp(strP, "..") == 0) {
+					directoryBack(currentDir);
 				}
 				else {
-					drawLongFilename(entriesTable, pos, row);
+					if (strcmp(currentDir, "/")) {
+						strlcat(currentDir, "/", sizeof(currentDir));
+					}
+					strlcat(currentDir, strP, sizeof(currentDir));
 				}
-				if (pressed & (KEY_B)) {
-					break;
+				dItemCount = getDirectory(dTable, currentDir, fileTypes);
+				if (dItemCount == -1) {
+					directoryBack(currentDir);
+					dItemCount = 0;
 				}
-				updateInfoLog();
+				restart = true;
+			}
+			else {
+				return strP+1;
 			}
 		}
 	}
@@ -289,17 +309,18 @@ static void directoryBack(char *path) {
 	path[0] = '/';
 }
 
-static void directoryInit(char *dirTable) {
+static char **directoryInit(char *dirTable) {
 	dItemCount = 0;
-	memset(dirTable, 0, directoryCacheSize);
-	dCacheLeft = directoryCacheSize - (directoryMaxEntries * 4);
-	entriesTable = (char **)(dirTable + dCacheLeft);
-	entriesTable[dItemCount] = dirTable;
+	memset(dirTable, 0, DIRECTORY_CACHE_SIZE);
+	dCacheLeft = DIRECTORY_CACHE_SIZE - (DIRECTORY_MAX_ENTRIES * 4);
+	char **entTbl = (char **)(dirTable + dCacheLeft);
+	entTbl[dItemCount] = dirTable;
+	return entTbl;
 }
 /*
 static void directoryFlushCache() {
 	free(dTable);
-	dTable = 0;
+	dTable = NULL;
 	dItemCount = 0;
 	dirCRC32 = 0;
 }
@@ -314,10 +335,10 @@ const char *directoryStringFromPos(char **dirEntries, int pos) {
 static const char *directoryAddDirname(char **dirEntries, const char *dirName) {
 	char *dest = dirEntries[dItemCount];
 	int nameLen = strlen(dirName) + 1;
-	if (dItemCount < directoryMaxEntries) {
-		if ((dCacheLeft -= (nameLen)) > 0) {
+	if (dItemCount < DIRECTORY_MAX_ENTRIES) {
+		if ((dCacheLeft -= nameLen) > 0) {
 			memcpy(dest, dirName, nameLen);
-			dItemCount++;
+			dItemCount += 1;
 			dirEntries[dItemCount] = dest + nameLen;
 		}
 	}
@@ -327,16 +348,21 @@ static const char *directoryAddDirname(char **dirEntries, const char *dirName) {
 static const char *directoryAddFilename(char **dirEntries, const char *fileName) {
 	char *dest = dirEntries[dItemCount];
 	int nameLen = strlen(fileName) + 2;
-	if (dItemCount < directoryMaxEntries) {
-		if ((dCacheLeft -= (nameLen)) > 0) {
+	if (dItemCount < DIRECTORY_MAX_ENTRIES) {
+		if ((dCacheLeft -= nameLen) > 0) {
 			*dest = '~';
 			memcpy(dest+1, fileName, nameLen - 1);
-			dItemCount++;
+			dItemCount += 1;
 			dirEntries[dItemCount] = dest + nameLen;
 		}
 	}
 	return dest;
 }
+
+const char *browseAddFilename(const char *fileName) {
+	return directoryAddFilename(entriesTable, fileName);
+}
+
 
 static void directorySort(char **dirEntries, int count) {
 	int i, j, dirT;
@@ -357,6 +383,14 @@ static void directorySort(char **dirEntries, int count) {
 			break;
 		}
 	}
+}
+
+void initBrowse() {
+	if (dTable == NULL) {
+		dTable = malloc(DIRECTORY_CACHE_SIZE);
+	}
+	entriesTable = directoryInit(dTable);
+	dirCRC32 = 0;
 }
 
 static int getDirectory(char *dirTable, const char *dirName, const char *fileTypes) {
@@ -380,7 +414,7 @@ static int getDirectory(char *dirTable, const char *dirName, const char *fileTyp
 	dirCRC32 = i;
 	i = 0;
 
-	directoryInit(dirTable);
+	entriesTable = directoryInit(dirTable);
 	pDir = opendir(dirName);
 
 	if (pDir){
@@ -392,7 +426,8 @@ static int getDirectory(char *dirTable, const char *dirName, const char *fileTyp
 			}
 			if (pent->d_type == DT_DIR) {
 				directoryAddDirname(entriesTable, pent->d_name);
-			} else {
+			}
+			else {
 				getFileExtension(fileExtension, pent->d_name);
 				if (fileExtension[0] == 0) {
 					continue;
@@ -403,7 +438,7 @@ static int getDirectory(char *dirTable, const char *dirName, const char *fileTyp
 				directoryAddFilename(entriesTable, pent->d_name);
 			}
 			i++;
-			if (i >= directoryMaxEntries) {
+			if (i >= DIRECTORY_MAX_ENTRIES) {
 				break;
 			}
 			drawSpinner();
