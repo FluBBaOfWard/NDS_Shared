@@ -7,9 +7,31 @@ extern "C" {
 
 #define ARRSIZE(xxxx) (sizeof((xxxx))/sizeof((xxxx)[0]))
 
+#define MENU_M(name,draw,list) {name, draw, ARRSIZE(list), list}
+
 #define KEY_OPEN_MENU BIT(30)  // Key to open menu
 
 typedef void (*fptr)(void);
+
+// MenuItem
+typedef struct {
+	/// Text of item
+	const char *const text;
+	/// Function of item
+	const fptr fn;
+} MItem;
+
+// Menu
+typedef struct {
+	/// Name of menu
+	const char *const header;
+	/// Function to draw menu
+	const fptr drawFunc;
+	/// Number of items in the menu
+	int itemCount;
+	/// List of menu items
+	const MItem *items;
+} Menu;
 
 /// Autofire for button A
 extern u8 autoA;
@@ -60,6 +82,7 @@ void drawStrings(const char *str1, const char *str2, int col, int row, int pal);
 void drawItemBackground(const char *str, int row, int sub);
 void drawTabs(void);
 void setupMenu(void);
+void setupSubMenuText(void);
 void setupSubMenu(const char *menuString);
 void cls(int chrMap);
 void setupCompressedBackground(const void *tiles, const void *map, int rowOffset);
@@ -71,8 +94,6 @@ void infoOutput(const char *str);
 void updateInfoLog(void);
 void outputLogToScreen(void);
 void debugOutput(const char *str);
-void nullUI(void);
-void subUI(void);
 void uiDummy(void);
 void enterMenu(int menuNr);
 void openMenu(void);
@@ -83,7 +104,7 @@ bool isMenuOpen(void);
 void exitEmulator(void);
 
 void uiNullDefault(void);
-void uiYesNo(void);
+void uiAuto(void);
 
 void ui1(void);
 void ui2(void);

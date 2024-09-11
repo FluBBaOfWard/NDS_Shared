@@ -17,15 +17,14 @@
 
 #define MENU_MAX_DEPTH (8)
 
-extern const fptr fnMain[];
-extern const fptr *const fnListX[];
-extern const u8 menuXItems[];
-extern const fptr drawUIX[];
+extern const Menu *const menus[];
 
 static void exitUI(void);
 static void drawClock(void);
 static void setSelectedMenu(int menuNr);
 static void setSelectedMain(int menuNr);
+static void nullUI(void);
+static void subUI(void);
 
 static const char menuTopRow[] = {   0x82,0x83, ' ',0x81,0x82,0x82,0x82,0x82,0x83, ' ',0x81,0x82,0x82,0x82,0x82,0x82,0x82,0x82,0x83, ' ',0x81,0x82,0x82,0x82,0x82,0x82,0x83,0};
 static const char menuMiddleRow[] = { 'X',0x85, ' ',0x84, 'F', 'i', 'l', 'e',0x85, ' ',0x84, 'O', 'p', 't', 'i', 'o', 'n', 's',0x85, ' ',0x84, 'A', 'b', 'o', 'u', 't',0x85,0};
@@ -44,24 +43,24 @@ static const char tabTopAbout[] = {0x81,0x82,0x82,0x82,0x82,0x82,0x83,0};
 static const char tabMidAbout[] = {0x84, 'A', 'b', 'o', 'u', 't',0x85,0};
 static const char tabBotAbout[] = {0x89, ' ', ' ', ' ', ' ', ' ',0x8A,0};
 
-u8 autoA = 0;				// 0=off, 1=on, 2=R
+u8 autoA = 0;					// 0=off, 1=on, 2=R
 u8 autoB = 0;
 
-bool gDebugSet = 0;
+bool gDebugSet = false;
 bool settingsChanged = false;
 bool pauseEmulation = false;
 bool enableExit = false;
 
 int emuSettings = 0;
-int sleepTime = 60*60*5;		// 5min
+int sleepTime = 60*60*5;
 int selected = 0;
+int menuYOffset = 0;
 
 static int selectedMenu = 0;
 static int selectedMain = 0;
 static int lastMainMenu = 1;
 static int menuItemRow = 0;
 static int lineRepeat = 0;
-int menuYOffset = 0;
 // How deep we are in the menu tree
 static int menuLevel = 0;
 static char menuPath[MENU_MAX_DEPTH];
@@ -76,7 +75,12 @@ static char logBuffer[32][80];
 static char timeBuffer[6];
 
 void guiRunLoop(void) {
-	fnMain[selectedMenu]();
+	if (selectedMenu == 0) {
+		nullUI();
+	}
+	else {
+		subUI();
+	}
 	updateTime();
 }
 
@@ -85,20 +89,33 @@ void uiNullDefault() {
 	drawText("      press L+R for menu.", 11, 0);
 }
 
+void uiAuto() {
+	const Menu *menu = menus[selectedMenu];
+	if (menuLevel > 1) {
+		setupSubMenuText();
+		for (int i=0; i<menu->itemCount; i++) {
+			drawSubItem(menu->items[i].text, 0);
+		}
+	}
+	else {
+		setupMenu();
+		for (int i=0; i<menu->itemCount; i++) {
+			drawMenuItem(menu->items[i].text);
+		}
+	}
+}
+
 
 void setupMenu() {
 	drawTabs();
 	menuItemRow = 0;
 }
+void setupSubMenuText(void) {
+	setupSubMenu(menus[selectedMenu]->header);
+}
 void setupSubMenu(const char *menuString) {
 	setupMenu();
 	drawMenuText(menuString, 3, 0);
-}
-
-void uiYesNo() {
-	setupSubMenu("Are you sure?");
-	drawSubItem("Yes ", 0);
-	drawSubItem("No ", 0);
 }
 
 void drawTabs() {
@@ -271,10 +288,10 @@ void nullUI() {
 
 /// This is during menu.
 void subUI() {
-	const int key = getMenuInput(menuXItems[selectedMenu]);
+	const int key = getMenuInput(menus[selectedMenu]->itemCount);
 
 	if (key & KEY_A) {
-		fnListX[selectedMenu][selected]();
+		menus[selectedMenu]->items[selected].fn();
 	}
 	if (key & KEY_B) {
 		backOutOfMenu();
@@ -373,7 +390,7 @@ int getMenuTouch(int *keyHit, int sel, int itemCount) {
 
 void redrawUI() {
 	// Fix up vertical position of items
-	int itemCount = menuXItems[selectedMenu];
+	int itemCount = menus[selectedMenu]->itemCount;
 	if (itemCount > 9 && selected > 4) {
 		menuYOffset = (selected - 4);
 		if (menuYOffset > (itemCount - 9)) {
@@ -383,7 +400,7 @@ void redrawUI() {
 	else {
 		menuYOffset = 0;
 	}
-	drawUIX[selectedMenu]();
+	menus[selectedMenu]->drawFunc();
 	outputLogToScreen();
 }
 
@@ -445,7 +462,7 @@ void drawLongFilename(char **dirEntries, int item, int row) {
 
 void cls(int chrMap) {
 	int i = 0;
-	int len = 0x400;				// 512x256
+	int len = 0x400;			// 512x256
 	u32 *scr = (u32 *)map0sub;
 	for (; i < len; i++) {
 		scr[i] = 0x01200120;
@@ -727,12 +744,12 @@ void drawClock() {
 	char str[9];
 
 	strlcpy(str, "00:00:00", sizeof(str));
-	str[0] = ((timeBuffer[0] >> 4) & 3) + '0';	//Hours.
-	str[1] = (timeBuffer[0] & 15) + '0';
-	str[3] = ((timeBuffer[1] >> 4) & 15) + '0';	//Minutes.
-	str[4] = (timeBuffer[1] & 15) + '0';
-	str[6] = ((timeBuffer[2] >> 4) & 15) + '0';	//Seconds.
-	str[7] = (timeBuffer[2] & 15) + '0';
+	str[0] = ((timeBuffer[0] >> 4) & 0x3) + '0'; // Hours.
+	str[1] = (timeBuffer[0] & 0xF) + '0';
+	str[3] = ((timeBuffer[1] >> 4) & 0xF) + '0'; // Minutes.
+	str[4] = (timeBuffer[1] & 0xF) + '0';
+	str[6] = ((timeBuffer[2] >> 4) & 0xF) + '0'; // Seconds.
+	str[7] = (timeBuffer[2] & 0xF) + '0';
 
 	drawItem(str, 23, 0, 0);
 }
