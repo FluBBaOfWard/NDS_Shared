@@ -12,6 +12,7 @@ extern "C" {
 #define KEY_OPEN_MENU BIT(30)  // Key to open menu
 
 typedef void (*fptr)(void);
+typedef const char *const (*tfptr)(void);
 
 // MenuItem
 typedef struct {
@@ -19,6 +20,8 @@ typedef struct {
 	const char *const text;
 	/// Function of item
 	const fptr fn;
+	/// Function of to get second text
+	const tfptr txt2;
 } MItem;
 
 // Menu
@@ -33,10 +36,12 @@ typedef struct {
 	const MItem *items;
 } Menu;
 
-/// Autofire for button A
+/// Autofire for button A, 0=off, 1=on, 2=R
 extern u8 autoA;
-/// Autofire for button B
+/// Autofire for button B, 0=off, 1=on, 2=R
 extern u8 autoB;
+/// Gamma value for display
+extern u8 gGammaValue;
 
 /// Should we output debug text?
 extern bool gDebugSet;
@@ -55,6 +60,9 @@ extern int sleepTime;
 extern int selected;
 /// YOffset for menus with many items.
 extern int menuYOffset;
+
+extern const char *const autoTxt[];
+extern const char *const brighTxt[];
 
 void guiRunLoop(void);
 int getInput(void);
@@ -119,19 +127,35 @@ void ui10(void);
 
 char *updateTime(void);
 
-void autoPauseGameSet();
-void autoStateSet();
-void autoSettingsSet();
-void autoNVRAMSet();
-void saveNVRAMSet();
-void debugTextSet();
-void sleepSet();
-void powerSaveSet();
-void screenSwapSet();
-void autoASet();
-void autoBSet();
-void speedSet();
-void flickSet();
+void autoPauseGameSet(void);
+const char *getAutoPauseGameText(void);
+void autoStateSet(void);
+const char *getAutoStateText(void);
+void autoSettingsSet(void);
+const char *getAutoSettingsText(void);
+void autoNVRAMSet(void);
+const char *getAutoNVRAMText(void);
+void saveNVRAMSet(void);
+const char *getSaveNVRAMText(void);
+void debugTextSet(void);
+const char *getDebugText(void);
+void sleepSet(void);
+const char *getSleepText(void);
+void powerSaveSet(void);
+const char *getPowerSaveText(void);
+void screenSwapSet(void);
+const char *getScreenSwapText(void);
+/// Change gamma (brightness)
+void gammaSet(void);
+const char *getGammaText(void);
+void autoASet(void);
+const char *getAutoAText(void);
+void autoBSet(void);
+const char *getAutoBText(void);
+void speedSet(void);
+const char *getSpeedText(void);
+void flickSet(void);
+const char *getFlickText(void);
 
 #ifdef __cplusplus
 } // extern "C"

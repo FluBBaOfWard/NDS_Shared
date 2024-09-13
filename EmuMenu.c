@@ -43,8 +43,9 @@ static const char tabTopAbout[] = {0x81,0x82,0x82,0x82,0x82,0x82,0x83,0};
 static const char tabMidAbout[] = {0x84, 'A', 'b', 'o', 'u', 't',0x85,0};
 static const char tabBotAbout[] = {0x89, ' ', ' ', ' ', ' ', ' ',0x8A,0};
 
-u8 autoA = 0;					// 0=off, 1=on, 2=R
+u8 autoA = 0;
 u8 autoB = 0;
+u8 gGammaValue = 0;
 
 bool gDebugSet = false;
 bool settingsChanged = false;
@@ -55,6 +56,12 @@ int emuSettings = 0;
 int sleepTime = 60*60*5;
 int selected = 0;
 int menuYOffset = 0;
+
+const char *const autoTxt[]  = {"Off", "On", "With R"};
+const char *const brighTxt[] = {"I", "II", "III", "IIII", "IIIII"};
+static const char *const speedTxt[] = {"Normal", "200%", "Max", "50%"};
+static const char *const sleepTxt[] = {"5min", "10min", "30min", "Off"};
+static char *const flickTxt[] = {"No Flicker", "Flicker"};
 
 static int selectedMenu = 0;
 static int selectedMain = 0;
@@ -89,16 +96,26 @@ void uiNullDefault() {
 	drawText("      press L+R for menu.", 11, 0);
 }
 
-void uiAuto() {
+void uiAutoSub() {
+	setupSubMenuText();
 	const Menu *menu = menus[selectedMenu];
-	if (menuLevel > 1) {
-		setupSubMenuText();
-		for (int i=0; i<menu->itemCount; i++) {
-			drawSubItem(menu->items[i].text, 0);
+	for (int i=0; i<menu->itemCount; i++) {
+		const char *txt2 = NULL;
+		tfptr tf = menu->items[i].txt2;
+		if (tf != NULL) {
+			txt2 = tf();
 		}
+		drawSubItem(menu->items[i].text, txt2);
+	}
+}
+
+void uiAuto() {
+	if (menuLevel > 1) {
+		uiAutoSub();
 	}
 	else {
 		setupMenu();
+		const Menu *menu = menus[selectedMenu];
 		for (int i=0; i<menu->itemCount; i++) {
 			drawMenuItem(menu->items[i].text);
 		}
@@ -628,29 +645,24 @@ void drawItemBackground(const char *str, int row, int sub) {
 }
 
 void setupCompressedBackground(const void *tiles, const void *map, int rowOffset) {
-	int i;
 	decompress(tiles, BG_TILE_RAM_SUB(1), LZ77Vram);
 	decompress(map, map0sub+32*rowOffset, LZ77Vram);
-	for (i = 0; i < 32*(24-rowOffset); i++) {
+	for (int i = 0; i < 32*(24-rowOffset); i++) {
 		map0sub[i + 32*rowOffset] = map0sub[i + 32*rowOffset] | 0x8200;
 	}
 }
 
 void int2Str(int i, char *s) {
-	u32 j;
-	int mod,k;
-
-	j = bin2BCD(i);
-	for (k = 28; k >= 0; k -= 4) {
-		mod = (j>>k) & 15;
+	u32 j = bin2BCD(i);
+	for (int k = 28; k >= 0; k -= 4) {
+		int mod = (j>>k) & 15;
 		*(s++) = (mod + '0');
 	}
 	*(s++) = 0;
 }
 
 void int2HexStr(char *dest, int val) {
-	int i;
-	for (i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) {
 		dest[7-i] = (val & 0xF) + (((val & 0xF) < 10) ? '0' : '7');
 		val = val>>4;
 	}
@@ -658,8 +670,7 @@ void int2HexStr(char *dest, int val) {
 }
 
 void short2HexStr(char *dest, short val) {
-	int i;
-	for (i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		dest[3-i] = (val & 0xF) + (((val & 0xF) < 10) ? '0' : '7');
 		val = val>>4;
 	}
@@ -680,8 +691,7 @@ void updateInfoLog() {
 	}
 	if (logTimer >= 0) {
 		if (logTimer == 0) {
-			int i;
-			for (i = 0; i < 8; i++) {
+			for (int i = 0; i < 8; i++) {
 				char *str = logBuffer[((logBufPtr-7+i)&7)];
 				if (str[0] != 0) {
 					drawText("", i+16, 0);
@@ -695,8 +705,7 @@ void updateInfoLog() {
 }
 
 void outputLogToScreen() {
-	int i;
-	for (i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) {
 		char *str = logBuffer[((logBufPtr-7+i)&7)];
 		if (str[0] != 0) {
 			drawText(str, i+16, 0);
@@ -763,9 +772,17 @@ void autoPauseGameSet() {
 	setMuteSoundGUI();
 }
 
+const char *getAutoPauseGameText() {
+	return autoTxt[emuSettings & AUTOPAUSE_EMULATION];
+}
+
 void autoStateSet() {
 	emuSettings ^= AUTOLOAD_STATE;
 	settingsChanged = true;
+}
+
+const char *getAutoStateText() {
+	return autoTxt[(emuSettings & AUTOLOAD_STATE)>>2];
 }
 
 void autoSettingsSet() {
@@ -773,9 +790,17 @@ void autoSettingsSet() {
 	settingsChanged = true;
 }
 
+const char *getAutoSettingsText() {
+	return autoTxt[(emuSettings & AUTOSAVE_SETTINGS)>>9];
+}
+
 void autoNVRAMSet() {
 	emuSettings ^= AUTOLOAD_NVRAM;
 	settingsChanged = true;
+}
+
+const char *getAutoNVRAMText() {
+	return autoTxt[(emuSettings & AUTOLOAD_NVRAM)>>10];
 }
 
 void saveNVRAMSet() {
@@ -783,13 +808,20 @@ void saveNVRAMSet() {
 	settingsChanged = true;
 }
 
+const char *getSaveNVRAMText() {
+	return autoTxt[(emuSettings & AUTOSAVE_NVRAM)>>11];
+}
+
 void debugTextSet() {
 	gDebugSet ^= true;
 }
 
+const char *getDebugText() {
+	return autoTxt[gDebugSet & 1];
+}
+
 void sleepSet() {
-	int i;
-	i = (emuSettings+0x10) & AUTOSLEEP_MASK;
+	int i = (emuSettings+0x10) & AUTOSLEEP_MASK;
 	emuSettings = (emuSettings & ~AUTOSLEEP_MASK) | i;
 	if (i == AUTOSLEEP_5MIN) {
 		sleepTime = 60*60*5;		// 5 min
@@ -806,9 +838,17 @@ void sleepSet() {
 	settingsChanged = true;
 }
 
+const char *getSleepText() {
+	return sleepTxt[(emuSettings & AUTOSLEEP_MASK)>>4];
+}
+
 void powerSaveSet() {
 	emuSettings ^= POWER_SAVE_MENU;
 	settingsChanged = true;
+}
+
+const char *getPowerSaveText() {
+	return autoTxt[(emuSettings & POWER_SAVE_MENU)>>1];
 }
 
 void screenSwapSet() {
@@ -816,16 +856,36 @@ void screenSwapSet() {
 	settingsChanged = true;
 }
 
+const char *getScreenSwapText() {
+	return autoTxt[(emuSettings & MAIN_ON_BOTTOM)>>8];
+}
+
+void gammaSet() {
+	gGammaValue++;
+	if (gGammaValue > 4) gGammaValue = 0;
+	settingsChanged = true;
+}
+
+const char *getGammaText() {
+	return brighTxt[gGammaValue];
+}
+
 void autoASet() {
 	autoA++;
 	joyCfg |= KEY_A+(KEY_A<<16);
 	if (autoA == 1) {
 		joyCfg &= ~KEY_A;
-	} else if (autoA == 2) {
+	}
+	else if (autoA == 2) {
 		joyCfg &= ~(KEY_A<<16);
-	} else {
+	}
+	else {
 		autoA = 0;
 	}
+}
+
+const char *getAutoAText() {
+	return autoTxt[autoA];
 }
 
 void autoBSet() {
@@ -833,18 +893,27 @@ void autoBSet() {
 	joyCfg |= KEY_B+(KEY_B<<16);
 	if (autoB == 1) {
 		joyCfg &= ~KEY_B;
-	} else if (autoB == 2) {
+	}
+	else if (autoB == 2) {
 		joyCfg &= ~(KEY_B<<16);
-	} else {
+	}
+	else {
 		autoB = 0;
 	}
 }
 
+const char *getAutoBText() {
+	return autoTxt[autoB];
+}
+
 void speedSet() {
-	int i;
-	i = (emuSettings+0x40) & EMUSPEED_MASK;
+	int i = (emuSettings+0x40) & EMUSPEED_MASK;
 	emuSettings = (emuSettings & ~EMUSPEED_MASK) | i;
 	setEmuSpeed(i>>6);
+}
+
+const char *getSpeedText() {
+	return speedTxt[(emuSettings & EMUSPEED_MASK)>>6];
 }
 
 void flickSet() {
@@ -853,4 +922,8 @@ void flickSet() {
 		gFlicker = 0;
 		gTwitch = 0;
 	}
+}
+
+const char *getFlickText() {
+	return flickTxt[gFlicker & 1];
 }
