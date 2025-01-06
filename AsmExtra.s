@@ -192,7 +192,7 @@ calculateFPS:					;@ fps output, r0-r3=used.
 
 	bx lr
 ;@----------------------------------------------------------------------------
-setLCDFPS:					;@ Write LCD FPS, r0=in fps, r0-r1=used.
+setLCDFPS:					;@ Write LCD FPS, r0=in fps, r0-r3=used.
 	.type setLCDFPS STT_FUNC
 ;@----------------------------------------------------------------------------
 	mov r1,#10

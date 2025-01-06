@@ -36,6 +36,9 @@ typedef struct {
 	const MItem *items;
 } Menu;
 
+extern const char *const autoTxt[];
+extern const char *const brighTxt[];
+
 /// Autofire for button A, 0=off, 1=on, 2=R
 extern u8 autoA;
 /// Autofire for button B, 0=off, 1=on, 2=R
@@ -60,9 +63,6 @@ extern int sleepTime;
 extern int selected;
 /// YOffset for menus with many items.
 extern int menuYOffset;
-
-extern const char *const autoTxt[];
-extern const char *const brighTxt[];
 
 void guiRunLoop(void);
 int getInput(void);

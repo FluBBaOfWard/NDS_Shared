@@ -43,6 +43,12 @@ static const char tabTopAbout[] = {0x81,0x82,0x82,0x82,0x82,0x82,0x83,0};
 static const char tabMidAbout[] = {0x84, 'A', 'b', 'o', 'u', 't',0x85,0};
 static const char tabBotAbout[] = {0x89, ' ', ' ', ' ', ' ', ' ',0x8A,0};
 
+const char *const autoTxt[]  = {"Off", "On", "With R"};
+const char *const brighTxt[] = {"I", "II", "III", "IIII", "IIIII"};
+static const char *const speedTxt[] = {"Normal", "200%", "Max", "50%"};
+static const char *const sleepTxt[] = {"5min", "10min", "30min", "Off"};
+static char *const flickTxt[] = {"No Flicker", "Flicker"};
+
 u8 autoA = 0;
 u8 autoB = 0;
 u8 gGammaValue = 0;
@@ -56,12 +62,6 @@ int emuSettings = 0;
 int sleepTime = 60*60*5;
 int selected = 0;
 int menuYOffset = 0;
-
-const char *const autoTxt[]  = {"Off", "On", "With R"};
-const char *const brighTxt[] = {"I", "II", "III", "IIII", "IIIII"};
-static const char *const speedTxt[] = {"Normal", "200%", "Max", "50%"};
-static const char *const sleepTxt[] = {"5min", "10min", "30min", "Off"};
-static char *const flickTxt[] = {"No Flicker", "Flicker"};
 
 static int selectedMenu = 0;
 static int selectedMain = 0;
