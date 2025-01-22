@@ -9,6 +9,7 @@ Shared code for all my emulators on the Nintendo DS
 * <https://github.com/FluBBaOfWard/DoubleDribbleDS>
 * <https://github.com/FluBBaOfWard/GhostsNGoblinsDS>
 * <https://github.com/FluBBaOfWard/K80DS>
+* <https://github.com/FluBBaOfWard/LodjurDS>
 * <https://github.com/FluBBaOfWard/NGPDS>
 * <https://github.com/FluBBaOfWard/NitroGrafx>
 * <https://github.com/FluBBaOfWard/NitroSwan>
@@ -22,6 +23,8 @@ Shared code for all my emulators on the Nintendo DS
 
 Fredrik Ahlström
 
-X/Twitter @TheRealFluBBa
+<https://bsky.app/profile/therealflubba.bsky.social>
 
 <https://www.github.com/FluBBaOfWard>
+
+X/Twitter @TheRealFluBBa
