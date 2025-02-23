@@ -54,7 +54,7 @@ int findFolder(const char *folderName);
 
 /**
  * Finds the last characters after the dot in the fileName.
- * @param  *dest: Where to put the result.
+ * @param  *dest: Where to put the result. Must be (at least) 8 bytes.
  * @param  *fileName: The file name to handle.
  */
 void getFileExtension(char *dest, const char *fileName);
@@ -67,6 +67,14 @@ void getFileExtension(char *dest, const char *fileName);
  * @param  dstSize: Total size of filename buffer.
  */
 void setFileExtension(char *dest, const char *fileName, const char *newExt, int dstSize);
+
+/**
+ * Truncates a filename to fit destination but always includes the filename extension.
+ * @param  *dest: The destination where fileName plus extension ends up, can be the same as fileName.
+ * @param  *fileName: The original file name with extension.
+ * @param  dstSize: Total size of filename buffer.
+ */
+void truncateFileName(char *dest, const char *fileName, int dstSize);
 
 /**
  * A file browser that shows files according to the file types specified.

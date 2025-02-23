@@ -217,6 +217,18 @@ void setFileExtension(char *dest, const char *fileName, const char *newExt, int 
 	strlcat(dest, newExt, dstSize);
 }
 
+void truncateFileName(char *dest, const char *fileName, int dstSize) {
+	if (dest != fileName) {
+		strlcpy(dest, fileName, dstSize);
+	}
+	char *strExt;
+	if ((strExt = strrchr(fileName, '.')) != NULL
+			&& strlen(fileName) >= dstSize) {
+		dest[dstSize - strlen(strExt) - 1] = 0;
+		strlcat(dest, strExt, dstSize);
+	}
+}
+
 static const char *selectInDirectory(bool resetPos) {
 	static int pos = 0;
 	if (resetPos) {
@@ -399,10 +411,6 @@ void initBrowse(const char *dirName) {
 static int getDirectory(char *dirTable, const char *dirName, const char *fileTypes) {
 	int i;
 
-	DIR *pDir;
-	struct dirent *pent;
-	char fileExtension[8];
-
 	chdir("/");			// Stupid workaround.
 	if (chdir(dirName) == -1) {
 		return -1;
@@ -418,9 +426,10 @@ static int getDirectory(char *dirTable, const char *dirName, const char *fileTyp
 	i = 0;
 
 	entriesTable = directoryInit(dirTable);
-	pDir = opendir(dirName);
+	DIR *pDir = opendir(dirName);
 
 	if (pDir){
+		struct dirent *pent;
 		while ((pent = readdir(pDir)) != NULL) {
 			if (strncmp("..", pent->d_name, 2)) {
 				if (strncmp(".", pent->d_name, 1) == 0) {
@@ -431,11 +440,11 @@ static int getDirectory(char *dirTable, const char *dirName, const char *fileTyp
 				directoryAddDirname(entriesTable, pent->d_name);
 			}
 			else {
+				char fileExtension[8];
 				getFileExtension(fileExtension, pent->d_name);
-				if (fileExtension[0] == 0) {
-					continue;
-				}
-				if (strstr(fileTypes, fileExtension) == 0) {
+				if (strstr(fileTypes, "*") == NULL
+						&& (fileExtension[0] == 0
+						|| strstr(fileTypes, fileExtension) == NULL)) {
 					continue;
 				}
 				directoryAddFilename(entriesTable, pent->d_name);
