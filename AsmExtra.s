@@ -2,15 +2,17 @@
 
 #include "nds_asm.h"
 
+	.global fpsValue
+	.global fpsText
+	.global fpsNominal
+	.global fpsTarget
+
 	.global getTime
 	.global bin2BCD
 	.global getRandomNumber
 	.global setupSpriteScaling
 	.global calculateFPS
-	.global setLCDFPS
-	.global fpsValue
-	.global fpsText
-	.global fpsNominal
+	.global setTargetFPS
 	.global convertPalette
 	.global debugOutputToEmulator
 	.global r0OutputToEmulator
@@ -49,7 +51,7 @@ getTime:					;@ Out r0 = ??ssMMHH, r1 = ??DDMMYY
 	ldmfd sp!,{lr}
 	bx lr
 ;@----------------------------------------------------------------------------
-bin2BCD:		;@ Transform value to BCD
+bin2BCD:					;@ Transform value to BCD
 	.type bin2BCD STT_FUNC
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{r4}
@@ -159,7 +161,7 @@ scaleLoop:
 	mov r2,#0x400
 	b memcpy
 ;@----------------------------------------------------------------------------
-calculateFPS:					;@ fps output, r0-r3=used.
+calculateFPS:				;@ fps output, r0-r3=used.
 	.type calculateFPS STT_FUNC
 ;@----------------------------------------------------------------------------
 	ldrb r0,fpsCheck
@@ -192,9 +194,10 @@ calculateFPS:					;@ fps output, r0-r3=used.
 
 	bx lr
 ;@----------------------------------------------------------------------------
-setLCDFPS:					;@ Write LCD FPS, r0=in fps, r0-r3=used.
-	.type setLCDFPS STT_FUNC
+setTargetFPS:				;@ Write target FPS, r0=in fps, r0-r3=used.
+	.type setTargetFPS STT_FUNC
 ;@----------------------------------------------------------------------------
+	strb r0,fpsTarget
 	mov r1,#10
 	swi 0x090000				;@ Division r0/r1, r0=result, r1=remainder.
 	add r0,r0,#0x30
@@ -207,6 +210,7 @@ fpsValue:	.long 0
 fpsText:	.string "FPS:   /60"
 fpsCheck:	.byte 0
 fpsNominal:	.byte 59
+fpsTarget:	.byte 60
 	.align 2
 
 ;@----------------------------------------------------------------------------
