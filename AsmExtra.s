@@ -209,7 +209,7 @@ setTargetFPS:				;@ Write target FPS, r0=in fps, r0-r3=used.
 fpsValue:	.long 0
 fpsText:	.string "FPS:   /60"
 fpsCheck:	.byte 0
-fpsNominal:	.byte 59
+fpsNominal:	.byte 59			;@ Host (DS LCD) FPS minus 1.
 fpsTarget:	.byte 60
 	.align 2
 

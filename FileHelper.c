@@ -198,7 +198,7 @@ void getFileExtension(char *dest, const char *fileName) {
 	}
 	strlcpy(dest, strExt, 8);
 	// Make file extension lower case
-	for (i = 1; i < 6; i++) {
+	for (i = 1; i < 7; i++) {
 		if (dest[i]) {
 			dest[i] |= 0x20;
 		}
@@ -379,14 +379,13 @@ const char *browseAddFilename(const char *fileName) {
 
 
 static void directorySort(char **dirEntries, int count) {
-	int i, j, dirT;
-	char *tmp;
+	int i, j;
 
 	for (j = 0; j < count; j++) {
-		dirT = 0;
+		int dirT = 0;
 		for (i = 0; i < count; i++) {
 			if (strcasecmp(dirEntries[i], dirEntries[i+1]) > 0) {
-				tmp = dirEntries[i];
+				char *tmp = dirEntries[i];
 				dirEntries[i] = dirEntries[i+1];
 				dirEntries[i+1] = tmp;
 				dirT = 1;
@@ -409,14 +408,13 @@ void initBrowse(const char *dirName) {
 }
 
 static int getDirectory(char *dirTable, const char *dirName, const char *fileTypes) {
-	int i;
-
 	chdir("/");			// Stupid workaround.
 	if (chdir(dirName) == -1) {
 		return -1;
 	}
 	drawText(dirName, 0, 0);
 
+	int i;
 	i = crc32(0, (const unsigned char *)dirName, strlen(dirName));
 	i = crc32(i, (const unsigned char *)fileTypes, strlen(fileTypes));
 	if (i == dirCRC32) {

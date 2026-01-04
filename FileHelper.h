@@ -53,7 +53,7 @@ bool saveDeviceState(const char *folderName);
 int findFolder(const char *folderName);
 
 /**
- * Finds the last characters after the dot in the fileName.
+ * Gets the last dot and the characters after, in the fileName.
  * @param  *dest: Where to put the result. Must be (at least) 8 bytes.
  * @param  *fileName: The file name to handle.
  */
@@ -63,8 +63,8 @@ void getFileExtension(char *dest, const char *fileName);
  * Sets or replaces the filename extension.
  * @param  *dest: The destination where fileName plus extension ends up, can be the same as fileName.
  * @param  *fileName: The original file name.
- * @param  *newExt: File extension to set.
- * @param  dstSize: Total size of filename buffer.
+ * @param  *newExt: File extension to set (including leading dot).
+ * @param  dstSize: Total size of destination buffer.
  */
 void setFileExtension(char *dest, const char *fileName, const char *newExt, int dstSize);
 
@@ -72,7 +72,7 @@ void setFileExtension(char *dest, const char *fileName, const char *newExt, int 
  * Truncates a filename to fit destination but always includes the filename extension.
  * @param  *dest: The destination where fileName plus extension ends up, can be the same as fileName.
  * @param  *fileName: The original file name with extension.
- * @param  dstSize: Total size of filename buffer.
+ * @param  dstSize: Total size of destination buffer.
  */
 void truncateFileName(char *dest, const char *fileName, int dstSize);
 
