@@ -326,7 +326,7 @@ bytecopy_:					;@ void bytecopy(u8 *dst, u8 *src, int count)
 	bx lr
 ;@----------------------------------------------------------------------------
 
-	.section .itcm
+	.section .itcm, "ax", %progbits
 	.align 2
 ;@----------------------------------------------------------------------------
 memclr_:					;@ r0=Dest r1=word count
