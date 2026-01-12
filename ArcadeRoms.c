@@ -48,7 +48,7 @@ bool loadACRoms(u8 *dest, const ArcadeGame *gameList, int gameNr, int gameCount,
 			}
 			continue;
 		}
-		if ( (file = fopen(romName, "r")) ) {
+		if ((file = fopen(romName, "r"))) {
 			if (doLoad) {
 				fread(dest, 1, romSize, file);
 				dest += romSize;

@@ -227,7 +227,7 @@ void enterMenu(int menuNr) {
 void backOutOfMenu() {
 	menuPositions[menuLevel] = selected;
 	menuLevel--;
-	if ( menuLevel < 0) {
+	if (menuLevel < 0) {
 		menuLevel = 0;
 	}
 	selected = menuPositions[menuLevel];
@@ -251,7 +251,9 @@ void openMenu() {
 }
 
 void closeMenu() {
-	menuLevel = 0;
+	if (menuLevel > 1) {
+		menuLevel = 1;
+	}
 	backOutOfMenu();
 }
 
@@ -276,7 +278,8 @@ void exitUI() {
 		powerOff(POWER_2D_B);
 		if (emuSettings & MAIN_ON_BOTTOM) {
 			powerOff(PM_BACKLIGHT_TOP);
-		} else {
+		}
+		else {
 			powerOff(PM_BACKLIGHT_BOTTOM);
 		}
 	}
@@ -376,8 +379,8 @@ int getMenuTouch(int *keyHit, int sel, int itemCount) {
 	if (*keyHit & KEY_TOUCH) {
 		touchRead(&myTouch);
 		yPos = (myTouch.py>>3) - 5;
-		if ( (yPos >= 0) && ((yPos>>1) < itemCount) && !(yPos&1) ) {
-			if (sel == (yPos>>1) ) {
+		if ((yPos >= 0) && ((yPos>>1) < itemCount) && !(yPos&1)) {
+			if (sel == (yPos>>1)) {
 				*keyHit |= KEY_A;
 			}
 			else {
@@ -385,19 +388,19 @@ int getMenuTouch(int *keyHit, int sel, int itemCount) {
 			}
 		} else if (myTouch.py < 24) {
 			xPos = myTouch.px>>3;
-			if ( (xPos > 3) && (xPos < 8)) {
+			if ((xPos > 3) && (xPos < 8)) {
 				setSelectedMain(1);
 				sel = 0;
 			}
-			else if ( (xPos > 10) && (xPos < 18)) {
+			else if ((xPos > 10) && (xPos < 18)) {
 				setSelectedMain(2);
 				sel = 0;
 			}
-			else if ( (xPos > 20) && (xPos < 26)) {
+			else if ((xPos > 20) && (xPos < 26)) {
 				setSelectedMain(3);
 				sel = 0;
 			}
-			else if ( xPos < 2) {
+			else if (xPos < 2) {
 				*keyHit |= KEY_B;
 			}
 		}
@@ -436,10 +439,10 @@ int drawFileList(char **dirEntries, int sel, int itemCount) {
 
 	for (i = 0; i < (SCREEN_HEIGHT / 8 - 1); i++) {
 		buf = directoryStringFromPos(dirEntries, firstItem + i);
-		if ( buf == NULL ) {
+		if (buf == NULL) {
 			buf = "";
 		}
-		if ( *buf == '~' ) {
+		if (*buf == '~') {
 			buf++;
 		}
 		selectedFile = (i == (sel-firstItem)?4:0);
@@ -455,7 +458,7 @@ void drawLongFilename(char **dirEntries, int item, int row) {
 	int xLen, ofs = 0;
 
 	buf = directoryStringFromPos(dirEntries, item);
-	if ( *buf == '~' ) buf++;
+	if (*buf == '~') buf++;
 	xLen = strlen(buf)-32;
 	if (xLen < 1) {
 		return;

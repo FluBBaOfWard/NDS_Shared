@@ -37,7 +37,7 @@
 #define RGB5(r,g,b)  ((r)|((g)<<5)|((b)<<10))
 #define RGB8(r,g,b)  (((r)>>3)|(((g)>>3)<<5)|(((b)>>3)<<10))
 /** Macro to convert 5 bit r g b components plus 1 bit alpha into a single 16 bit ARGB triplet */
-#define ARGB16(a, r, g, b) ( ((a) << 15) | (r)|((g)<<5)|((b)<<10))
+#define ARGB16(a, r, g, b) (((a) << 15) | (r)|((g)<<5)|((b)<<10))
 
 /** Screen width in pixels */
 #define SCREEN_WIDTH  256

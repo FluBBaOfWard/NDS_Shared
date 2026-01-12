@@ -235,14 +235,14 @@ static const char *selectInDirectory(bool resetPos) {
 		pos = 0;
 	}
 	if (pos >= dItemCount) {
-		pos = dItemCount-1;
+		pos = 0;
 	}
 	int row = 0, oldPos = -1;
 	while (1) {
 		waitVBlank();
 		int pressed = getInput();
 		pos = getMenuPos(pressed, pos, dItemCount);
-		if (pressed & (KEY_A)) {
+		if (pressed & KEY_A) {
 			return directoryStringFromPos(entriesTable, pos);
 		}
 		if (oldPos != pos) {
@@ -253,7 +253,7 @@ static const char *selectInDirectory(bool resetPos) {
 		else {
 			drawLongFilename(entriesTable, pos, row);
 		}
-		if (pressed & (KEY_B)) {
+		if (pressed & KEY_B) {
 			break;
 		}
 		updateInfoLog();
@@ -290,7 +290,7 @@ const char *browseForFileType(const char *fileTypes) {
 	if (dItemCount > 0) {
 		const char *strP;
 		bool restart = false;
-		while ((strP = selectInDirectory(restart)) != NULL ) {
+		while ((strP = selectInDirectory(restart)) != NULL) {
 			if (!strstr(strP, "~")) {
 				if (strcmp(strP, "..") == 0) {
 					directoryBack(currentDir);
