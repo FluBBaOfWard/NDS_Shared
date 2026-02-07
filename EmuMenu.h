@@ -95,6 +95,7 @@ void setupSubMenu(const char *menuString);
 void cls(int chrMap);
 void setupCompressedBackground(const void *tiles, const void *map, int rowOffset);
 void int2Str(int i, char *s);
+void char2Str(char *dst, int val);
 void int2HexStr(char *dest, int val);
 void short2HexStr(char *dest, short val);
 void char2HexStr(char *dest, char val);

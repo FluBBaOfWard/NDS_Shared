@@ -664,6 +664,15 @@ void int2Str(int i, char *s) {
 	*(s++) = 0;
 }
 
+void char2Str(char *dst, int val) {
+	u32 j = bin2BCD(val);
+	for (int k = 8; k >= 0; k -= 4) {
+		int mod = (j>>k) & 15;
+		*(dst++) = (mod + '0');
+	}
+	*(dst++) = 0;
+}
+
 void int2HexStr(char *dest, int val) {
 	for (int i = 0; i < 8; i++) {
 		dest[7-i] = (val & 0xF) + (((val & 0xF) < 10) ? '0' : '7');
