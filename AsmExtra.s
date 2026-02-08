@@ -20,6 +20,7 @@
 	.global enableSlot2Cache
 	.global disableSlot2Cache
 	.global bytecopy_
+	.global memmem_
 	.global memclr_
 	.global memset_
 	.global memorr_
@@ -314,13 +315,47 @@ disableSlot2Cache:
 	mcr	p15,0,r0,c2,c0,0
 	bx lr
 ;@----------------------------------------------------------------------------
-bytecopy_:					;@ void bytecopy(u8 *dst, u8 *src, int count)
+bytecopy_:					;@ void bytecopy_(u8 *dst, const u8 *src, int count)
+	.type bytecopy_ STT_FUNC
 ;@----------------------------------------------------------------------------
 	subs r2,r2,#1
 	ldrbpl r3,[r1,r2]
 	strbpl r3,[r0,r2]
 	bhi bytecopy_
 	bx lr
+;@----------------------------------------------------------------------------
+memmem_:
+	.type memmem_ STT_FUNC
+;@ const void *memmem_(const void *haystack, int hLen, const void *needle, int nLen);
+;@----------------------------------------------------------------------------
+	subs r1,r1,r3
+	movmi r0,#0
+	bxmi lr
+	stmfd sp!,{r4-r7}
+	ldrb r4,[r2],#1
+mmLoop:
+	ldrb r5,[r0],#1
+	cmp r4,r5
+	beq mmTestMore
+	subs r1,r1,#1
+	bpl mmLoop
+	mov r0,#0
+	b mmEnd
+mmTestMore:
+	sub r6,r3,#2
+mmLoop2:
+	ldrb r7,[r2,r6]
+	ldrb r5,[r0,r6]
+	cmp r7,r5
+	bne mmLoop
+	subs r6,r6,#1
+	bpl mmLoop2
+	sub r0,r0,#1
+
+mmEnd:
+	ldmfd sp!,{r4-r7}
+	bx lr
+
 ;@----------------------------------------------------------------------------
 
 	.section .itcm, "ax", %progbits

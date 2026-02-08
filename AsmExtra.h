@@ -50,6 +50,26 @@ void convertPalette(u16 *dest, const u8 *source, int length, int gamma);
 void debugOutputToEmulator(const char *text);
 
 /**
+ * Copy bytes from src to dst, guaranteed to only use byte read & writes,
+ * good accessing SLOT-2 NVRAM.
+ * @param  *dst: Where to copy to.
+ * @param  *src: Where to copy from.
+ * @param  *length: How many bytes to copy.
+ */
+void bytecopy_(u8 *dst, const u8 *src, int length);
+
+/**
+ * Copy bytes from src to dst, guaranteed to only use byte read & writes,
+ * good accessing SLOT-2 NVRAM.
+ * @param  *haystack: Where to search.
+ * @param  *hLen: How many bytes to search.
+ * @param  *needle: The needle to search for.
+ * @param  *nLen: How many bytes long the needle is.
+ */
+const void *memmem_(const void *haystack, int hLen, const void *needle, int nLen);
+
+
+/**
   * Enable Data caching for SLOT-2 (region 3)
  */
 void enableSlot2Cache(void);
