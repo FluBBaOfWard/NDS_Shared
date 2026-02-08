@@ -131,35 +131,32 @@ rndSeed1:
 ;@----------------------------------------------------------------------------
 setupSpriteScaling:			;@ r0=Scaling parameters.
 ;@----------------------------------------------------------------------------
-	stmfd sp!,{r4-r6}
-	ldmia r0,{r1-r6}			;@ Get sprite scaling params
-	add r0,r1,#6
+	stmfd sp!,{r4,lr}
+	ldmia r0,{r1-r4,r12,lr}		;@ Get sprite scaling params
+	add r1,r1,#6
 
-	mov r12,#2
+	mov r0,#2
 scaleLoop:
-	strh r3,[r0],#8				;@ Buffer1, buffer2.
-	strh r2,[r0],#8
-	strh r2,[r0],#8
-	strh r5,[r0],#232
-		strh r4,[r0],#8
-		strh r2,[r0],#8
-		strh r2,[r0],#8
-		strh r5,[r0],#232
-			strh r3,[r0],#8
-			strh r2,[r0],#8
-			strh r2,[r0],#8
-			strh r6,[r0],#232
-		strh r4,[r0],#8
-		strh r2,[r0],#8
-		strh r2,[r0],#8
-		strh r6,[r0],#232
-	subs r12,r12,#1
+	strh r3,[r1],#8				;@ Buffer1, buffer2.
+	strh r2,[r1],#8
+	strh r2,[r1],#8
+	strh r12,[r1],#232
+		strh r4,[r1],#8			;@ Flipped Horizontal
+		strh r2,[r1],#8
+		strh r2,[r1],#8
+		strh r12,[r1],#232
+			strh r3,[r1],#8		;@ Flipped Vertical
+			strh r2,[r1],#8
+			strh r2,[r1],#8
+			strh lr,[r1],#232
+				strh r4,[r1],#8	;@ Flipped Vertical & Horizontal
+				strh r2,[r1],#8
+				strh r2,[r1],#8
+				strh lr,[r1],#232
+	subs r0,r0,#1
 	bne scaleLoop
 
-	ldmfd sp!,{r4-r6}
-	mov r0,#OAM
-	mov r2,#0x400
-	b memcpy
+	ldmfd sp!,{r4,pc}
 ;@----------------------------------------------------------------------------
 calculateFPS:				;@ fps output, r0-r3=used.
 	.type calculateFPS STT_FUNC
