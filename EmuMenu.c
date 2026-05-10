@@ -243,7 +243,7 @@ void openMenu() {
 	lcdMainOnTop();
 	if (emuSettings & AUTOPAUSE_EMULATION) {
 		pauseEmulation = true;
-		setMuteSoundGUI();
+		soundSetMuteGUI();
 	}
 	if (emuSettings & AUTOSAVE_NVRAM) {
 		saveNVRAM();
@@ -285,7 +285,7 @@ void exitUI() {
 	}
 	exitGUI();
 	pauseEmulation = false;
-	setMuteSoundGUI();
+	soundSetMuteGUI();
 }
 
 /// This is during emulation.
@@ -781,7 +781,7 @@ void autoPauseGameSet() {
 	emuSettings ^= AUTOPAUSE_EMULATION;
 	settingsChanged = true;
 	pauseEmulation = (emuSettings & AUTOPAUSE_EMULATION);
-	setMuteSoundGUI();
+	soundSetMuteGUI();
 }
 
 const char *getAutoPauseGameText() {
