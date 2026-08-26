@@ -274,6 +274,14 @@ const char *browseDirectory() {
 	return NULL;
 }
 
+static int getExistingDirectory(char *dirTable, char *dirName, const char *fileTypes) {
+	int itemCount;
+	while ((itemCount = getDirectory(dirTable, dirName, fileTypes)) < 0) {
+		directoryBack(dirName);
+	}
+	return itemCount;
+}
+
 //---------------------------------------------------------------------------------
 const char *browseForFileType(const char *fileTypes) {
 	if (!fatAvailable) {
@@ -283,10 +291,7 @@ const char *browseForFileType(const char *fileTypes) {
 	if (dTable == NULL) {
 		dTable = malloc(DIRECTORY_CACHE_SIZE);
 	}
-	dItemCount = getDirectory(dTable, currentDir, fileTypes);
-	if (dItemCount == -1) {
-		directoryBack(currentDir);
-	}
+	dItemCount = getExistingDirectory(dTable, currentDir, fileTypes);
 	if (dItemCount > 0) {
 		const char *strP;
 		bool restart = false;
@@ -301,11 +306,7 @@ const char *browseForFileType(const char *fileTypes) {
 					}
 					strlcat(currentDir, strP, sizeof(currentDir));
 				}
-				dItemCount = getDirectory(dTable, currentDir, fileTypes);
-				if (dItemCount == -1) {
-					directoryBack(currentDir);
-					dItemCount = 0;
-				}
+				dItemCount = getExistingDirectory(dTable, currentDir, fileTypes);
 				restart = true;
 			}
 			else {
