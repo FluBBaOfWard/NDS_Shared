@@ -152,10 +152,14 @@ bool saveDeviceState(const char *folderName) {
 			cls(0);
 			drawText("        Saving state...", 11, 0);
 			packState(statePtr);
-			fwrite(statePtr, 1, stateSize, file);
+			if (fwrite(statePtr, 1, stateSize, file) == stateSize) {
+				err = false;
+				infoOutput("Saved state.");
+			}
+			else {
+				infoOutput("Error saving state!");
+			}
 			free(statePtr);
-			err = false;
-			infoOutput("Saved state.");
 		}
 		else {
 			infoOutput("Couldn't alloc mem for state.");
