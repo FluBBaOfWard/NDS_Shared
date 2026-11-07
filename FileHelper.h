@@ -31,9 +31,10 @@ int loadROM(void *dest, const char *fileName, const int maxSize);
  * Handles filename creation, file opening/closing, memory handling, error output.
  * How the state is put into the device should be handled by a unpackState function.
  * @param  *folderName: Name of the folder where state is loaded from.
+ * @param  silent: Silences error about file not found.
  * @return True if there was an error.
  */
-bool loadDeviceState(const char *folderName);
+bool loadDeviceState(const char *folderName, bool silent);
 
 /**
  * Saves a state file for the currently running game.

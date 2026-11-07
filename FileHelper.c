@@ -99,7 +99,7 @@ int loadROM(void *dest, const char *fileName, const int maxSize) {
 	return size;
 }
 
-bool loadDeviceState(const char *folderName) {
+bool loadDeviceState(const char *folderName, bool silent) {
 	bool err = true;
 	FILE *file;
 	u32 *statePtr;
@@ -129,7 +129,7 @@ bool loadDeviceState(const char *folderName) {
 		}
 		fclose(file);
 	}
-	else {
+	else if (!silent) {
 		infoOutput("Couldn't open state file:");
 		infoOutput(stateName);
 	}
