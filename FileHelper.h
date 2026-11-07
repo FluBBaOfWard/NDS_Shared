@@ -84,6 +84,14 @@ void truncateFileName(char *dest, const char *fileName, int dstSize);
 const char *browseForFileType(const char *fileTypes);
 
 /**
+ * A file browser that shows files according to the file types specified.
+ * @param  *fileTypes: All file types that are valid (".txt.bin.rom.zip", etc).
+ * @param  *path: A starting path where to browse.
+ * @return The selected files name, or NULL if none selected.
+ */
+const char *browseForFileTypeInPath(const char *fileTypes, const char *path);
+
+/**
  * Inits the directory structs, use browseAddFilename to add entries
  * that later can be browsed.
  * @param dirName: Label at the top of the screen.

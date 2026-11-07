@@ -287,6 +287,11 @@ static int getExistingDirectory(char *dirTable, char *dirName, const char *fileT
 }
 
 //---------------------------------------------------------------------------------
+const char *browseForFileTypeInPath(const char *fileTypes, const char *path) {
+	strlcpy(currentDir, path, sizeof(currentDir));
+	return browseForFileType(fileTypes);
+}
+//---------------------------------------------------------------------------------
 const char *browseForFileType(const char *fileTypes) {
 	if (!fatAvailable) {
 		return NULL;
